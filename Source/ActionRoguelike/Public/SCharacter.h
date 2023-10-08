@@ -11,6 +11,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class ASMagicProjectile;
 class USInteractionComponent;
+class UAnimMontage;
 
 UCLASS()
 class ACTIONROGUELIKE_API ASCharacter : public ACharacter
@@ -22,8 +23,28 @@ public:
 	ASCharacter();
 
 protected:
-	UPROPERTY(EditAnywhere)
+
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	USpringArmComponent* SpringArmComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	UCameraComponent* CameraComp;
+
+
+	UPROPERTY(VisibleAnywhere, Category = "PrimaryInteract")
+	USInteractionComponent* InteractionComp;
+
+
+	UPROPERTY(EditAnywhere, Category = "PrimaryAttack")
 	TSubclassOf<ASMagicProjectile> ProjectileClass;
+
+	UPROPERTY(EditAnywhere, Category = "PrimaryAttack")
+	UAnimMontage* PrimaryAttackAnim;
+
+	UPROPERTY(EditAnywhere, Category = "PrimaryAttack")
+	float ProjectileSpawnDelayTime;
+
+	FTimerHandle TimerHandle_PrimaryAttack;
 
 protected:
 	// Called when the game starts or when spawned
@@ -35,16 +56,9 @@ protected:
 
 	void PrimaryAttack();
 
+	void PrimaryAttack_TimeElapsed();
+
 	void PrimaryInteract();
-
-	UPROPERTY(VisibleAnywhere)
-	USpringArmComponent* SpringArmComp;
-
-	UPROPERTY(VisibleAnywhere)
-	UCameraComponent* CameraComp;
-
-	UPROPERTY(VisibleAnywhere)
-	USInteractionComponent* InteractionComp;
 
 public:	
 	// Called every frame

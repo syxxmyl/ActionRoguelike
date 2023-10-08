@@ -27,6 +27,8 @@ ASCharacter::ASCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	bUseControllerRotationYaw = false;
+
+	ProjectileSpawnDelayTime = 0.2f;
 }
 
 // Called when the game starts or when spawned
@@ -82,6 +84,13 @@ void ASCharacter::MoveRight(float value)
 }
 
 void ASCharacter::PrimaryAttack()
+{
+	PlayAnimMontage(PrimaryAttackAnim);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttack_TimeElapsed, ProjectileSpawnDelayTime);
+}
+
+void ASCharacter::PrimaryAttack_TimeElapsed()
 {
 	// 获取骨骼插槽为"Muzzle_01"的坐标，这样子弹就不是从玩家中心点发射
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
