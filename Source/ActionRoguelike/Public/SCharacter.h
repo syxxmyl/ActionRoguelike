@@ -10,6 +10,7 @@
 class USpringArmComponent;
 class UCameraComponent;
 class ASMagicProjectile;
+class USInteractionComponent;
 
 UCLASS()
 class ACTIONROGUELIKE_API ASCharacter : public ACharacter
@@ -34,11 +35,16 @@ protected:
 
 	void PrimaryAttack();
 
+	void PrimaryInteract();
+
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
 
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComp;
+
+	UPROPERTY(VisibleAnywhere)
+	USInteractionComponent* InteractionComp;
 
 public:	
 	// Called every frame
