@@ -25,6 +25,8 @@ protected:
 
 	void MoveForward(float value);
 
+	void MoveRight(float value);
+
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
 
