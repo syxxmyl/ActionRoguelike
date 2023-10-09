@@ -97,6 +97,7 @@ void ASCharacter::PrimaryAttack_TimeElapsed()
 	FTransform SpwanTM = FTransform(GetControlRotation(), HandLocation);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.Instigator = this;
 	GetWorld()->SpawnActor<ASMagicProjectile>(ProjectileClass, SpwanTM, SpawnParams);
 }
 
