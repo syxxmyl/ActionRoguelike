@@ -3,6 +3,7 @@
 
 #include "SExplosiveBarrel.h"
 #include "PhysicsEngine/RadialForceComponent.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 ASExplosiveBarrel::ASExplosiveBarrel()
@@ -17,7 +18,7 @@ ASExplosiveBarrel::ASExplosiveBarrel()
 	ForceComp = CreateDefaultSubobject<URadialForceComponent>("ForceComp");
 	ForceComp->SetupAttachment(MeshComp);
 
-	// TickComponen里会check active ，true的话在自身周围产生一个constant force ，但是在这里不会有影响，可设可不设
+	// TickComponent里会check active ，true的话球形探测自身周围的Actor，对其产生一个很小的constant force ，但是在这里不会有影响，可设可不设
 	// Constant Force 和 Impulse 的区别
 	// https://docs.unrealengine.com/4.27/zh-CN/Resources/ContentExamples/Physics/1_3/
 	ForceComp->SetAutoActivate(false);
@@ -55,5 +56,12 @@ void ASExplosiveBarrel::Tick(float DeltaTime)
 void ASExplosiveBarrel::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
 	ForceComp->FireImpulse();
+
+	UE_LOG(LogTemp, Log, TEXT("OnActorHit a barrel 爆炸"));
+
+	UE_LOG(LogTemp, Warning, TEXT("OtherActor: %s, at game time: %f"), *GetNameSafe(OtherActor), GetWorld()->GetTimeSeconds());
+
+	FString CombinedString = FString::Printf(TEXT("Hits at location: %s"), *Hit.ImpactPoint.ToString());
+	DrawDebugString(GetWorld(), Hit.ImpactPoint, CombinedString, nullptr, FColor::Green, 2.0f, true);
 }
 
