@@ -60,6 +60,8 @@ protected:
 
 	void PrimaryInteract();
 
+	FRotator CalcProjectileSpawnRotation(FVector HandLocation);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

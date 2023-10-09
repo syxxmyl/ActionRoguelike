@@ -94,11 +94,14 @@ void ASCharacter::PrimaryAttack_TimeElapsed()
 {
 	// 获取骨骼插槽为"Muzzle_01"的坐标，这样子弹就不是从玩家中心点发射
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-	FTransform SpwanTM = FTransform(GetControlRotation(), HandLocation);
+	FTransform SpwanTM = FTransform(CalcProjectileSpawnRotation(HandLocation), HandLocation);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Instigator = this;
-	GetWorld()->SpawnActor<ASMagicProjectile>(ProjectileClass, SpwanTM, SpawnParams);
+	if (ensure(ProjectileClass))
+	{
+		GetWorld()->SpawnActor<ASMagicProjectile>(ProjectileClass, SpwanTM, SpawnParams);
+	}
 }
 
 void ASCharacter::PrimaryInteract()
@@ -108,3 +111,40 @@ void ASCharacter::PrimaryInteract()
 		InteractionComp->PrimaryInteract();
 	}
 }
+
+FRotator FindLookAtRotation(FVector const& X)
+{
+	// https://zhuanlan.zhihu.com/p/108474984
+	FVector const NewX = X.GetSafeNormal();
+	FVector const UpVector = (FMath::Abs(NewX.Z) < (1.f - KINDA_SMALL_NUMBER)) ? FVector(0, 0, 1.f) : FVector(1.f, 0, 0);//得到原坐标轴的Z轴方向
+	const FVector NewY = (UpVector ^ NewX).GetSafeNormal();//叉乘可得到Y'
+	const FVector NewZ = NewX ^ NewY;//再次将X'与Y'叉乘即可得到Z'
+
+	return FMatrix(NewX, NewY, NewZ, FVector::ZeroVector).Rotator();
+}
+
+FRotator ASCharacter::CalcProjectileSpawnRotation(FVector HandLocation)
+{
+	FCollisionObjectQueryParams ObjectQueryParams; 
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+
+	FVector TraceBeginLocation = CameraComp->GetComponentLocation();
+	FVector TraceEndLocation = TraceBeginLocation + GetControlRotation().Vector() * 5000;
+
+	FRotator SpawnRotation;
+
+	FHitResult Hit;
+	bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit, TraceBeginLocation, TraceEndLocation, ObjectQueryParams);
+	if (bBlockingHit)
+	{
+		TraceEndLocation = Hit.ImpactPoint;
+	}
+
+	// SpawnRotation =  FRotationMatrix::MakeFromX(TraceEndLocation - HandLocation).Rotator();
+	SpawnRotation = FindLookAtRotation(TraceEndLocation - HandLocation);
+	DrawDebugLine(GetWorld(), HandLocation, TraceEndLocation, FColor::Red, false, 2.0f, 0, 2.0f);
+	return SpawnRotation;
+}
+
+
