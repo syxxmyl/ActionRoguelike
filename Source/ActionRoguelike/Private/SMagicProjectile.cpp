@@ -12,25 +12,14 @@ ASMagicProjectile::ASMagicProjectile()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
-	
 	// 只对Pawn的Overlap事件有反应
 	// SphereComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	// SphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	
+
 	//SphereComp->SetCollisionObjectType(ECC_WorldDynamic);
 
-	SphereComp->SetCollisionProfileName("Projectile");
-	RootComponent = SphereComp;
-
-	EffectComp = CreateDefaultSubobject<UParticleSystemComponent>("EffectComp");
-	EffectComp->SetupAttachment(SphereComp);
-
-	MovementComp = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComp");
-	MovementComp->InitialSpeed = 1000.0f;
-	MovementComp->bRotationFollowsVelocity = true;
-	MovementComp->bInitialVelocityInLocalSpace = true;
-
+	// 子弹生存时间
+	InitialLifeSpan = 3.0f;
 }
 
 // Called when the game starts or when spawned

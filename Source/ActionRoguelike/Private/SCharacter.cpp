@@ -5,7 +5,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "SMagicProjectile.h"
+#include "SProjectileBase.h"
 #include "SInteractionComponent.h"
 
 
@@ -61,6 +61,9 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	// PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASCharacter::PrimaryInteract);
+
+	PlayerInputComponent->BindAction("SwitchMagicProjectile", IE_Pressed, this, &ASCharacter::SwitchMagicProjectile);
+	PlayerInputComponent->BindAction("SwitchBlackholeProjectile", IE_Pressed, this, &ASCharacter::SwitchBlackholeProjectile);
 }
 
 void ASCharacter::MoveForward(float value)
@@ -98,9 +101,9 @@ void ASCharacter::PrimaryAttack_TimeElapsed()
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Instigator = this;
-	if (ensure(ProjectileClass))
+	if (ensure(ClassToSpawn))
 	{
-		GetWorld()->SpawnActor<ASMagicProjectile>(ProjectileClass, SpwanTM, SpawnParams);
+		GetWorld()->SpawnActor<ASProjectileBase>(ClassToSpawn, SpwanTM, SpawnParams);
 	}
 }
 
@@ -110,6 +113,16 @@ void ASCharacter::PrimaryInteract()
 	{
 		InteractionComp->PrimaryInteract();
 	}
+}
+
+void ASCharacter::SwitchMagicProjectile()
+{
+	ClassToSpawn = PrimaryAttackProjectile;
+}
+
+void ASCharacter::SwitchBlackholeProjectile()
+{
+	ClassToSpawn = SecondAttackProjectile;
 }
 
 FRotator FindLookAtRotation(FVector const& X)

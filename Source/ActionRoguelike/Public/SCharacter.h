@@ -9,7 +9,7 @@
 
 class USpringArmComponent;
 class UCameraComponent;
-class ASMagicProjectile;
+class ASProjectileBase;
 class USInteractionComponent;
 class UAnimMontage;
 
@@ -34,15 +34,21 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "PrimaryInteract")
 	USInteractionComponent* InteractionComp;
 
-
-	UPROPERTY(EditAnywhere, Category = "PrimaryAttack")
-	TSubclassOf<ASMagicProjectile> ProjectileClass;
-
-	UPROPERTY(EditAnywhere, Category = "PrimaryAttack")
+	UPROPERTY(EditAnywhere, Category = "Attack")
 	UAnimMontage* PrimaryAttackAnim;
 
-	UPROPERTY(EditAnywhere, Category = "PrimaryAttack")
+	UPROPERTY(EditAnywhere, Category = "Attack")
 	float ProjectileSpawnDelayTime;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	TSubclassOf<ASProjectileBase> ClassToSpawn;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	TSubclassOf<ASProjectileBase> PrimaryAttackProjectile;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	TSubclassOf<ASProjectileBase> SecondAttackProjectile;
+	
 
 	FTimerHandle TimerHandle_PrimaryAttack;
 
@@ -59,6 +65,10 @@ protected:
 	void PrimaryAttack_TimeElapsed();
 
 	void PrimaryInteract();
+
+	void SwitchMagicProjectile();
+
+	void SwitchBlackholeProjectile();
 
 	FRotator CalcProjectileSpawnRotation(FVector HandLocation);
 
