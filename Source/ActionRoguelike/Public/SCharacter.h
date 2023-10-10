@@ -12,6 +12,7 @@ class UCameraComponent;
 class ASProjectileBase;
 class USInteractionComponent;
 class UAnimMontage;
+class USAttributeComponent;
 
 UCLASS()
 class ACTIONROGUELIKE_API ASCharacter : public ACharacter
@@ -53,6 +54,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<ASProjectileBase> DashProjectile;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	USAttributeComponent* AttributeComp;
 	
 
 protected:
