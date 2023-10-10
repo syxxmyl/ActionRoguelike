@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -24,15 +24,15 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	// ´¦ÀíÅö×²
+	// å¤„ç†ç¢°æ’
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USphereComponent* SphereComp;
 
-	// ´¦ÀíÔË¶¯
+	// å¤„ç†è¿åŠ¨
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UProjectileMovementComponent* MovementComp;
 
-	// ´¦ÀíÁ£×ÓĞ§¹û
+	// å¤„ç†ç²’å­æ•ˆæœ
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UParticleSystemComponent* EffectComp;
 
