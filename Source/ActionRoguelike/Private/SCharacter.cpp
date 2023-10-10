@@ -64,6 +64,7 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	PlayerInputComponent->BindAction("SwitchMagicProjectile", IE_Pressed, this, &ASCharacter::SwitchMagicProjectile);
 	PlayerInputComponent->BindAction("SwitchBlackholeProjectile", IE_Pressed, this, &ASCharacter::SwitchBlackholeProjectile);
+	PlayerInputComponent->BindAction("SwitchDashProjectile", IE_Pressed, this, &ASCharacter::SwitchDashProjectile);
 }
 
 void ASCharacter::MoveForward(float value)
@@ -122,7 +123,12 @@ void ASCharacter::SwitchMagicProjectile()
 
 void ASCharacter::SwitchBlackholeProjectile()
 {
-	ClassToSpawn = SecondAttackProjectile;
+	ClassToSpawn = BlackholeProjectile;
+}
+
+void ASCharacter::SwitchDashProjectile()
+{
+	ClassToSpawn = DashProjectile;
 }
 
 FRotator FindLookAtRotation(FVector const& X)

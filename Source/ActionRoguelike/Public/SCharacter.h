@@ -40,6 +40,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	float ProjectileSpawnDelayTime;
 
+	FTimerHandle TimerHandle_PrimaryAttack;
+
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<ASProjectileBase> ClassToSpawn;
 
@@ -47,10 +49,11 @@ protected:
 	TSubclassOf<ASProjectileBase> PrimaryAttackProjectile;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<ASProjectileBase> SecondAttackProjectile;
+	TSubclassOf<ASProjectileBase> BlackholeProjectile;
 	
-
-	FTimerHandle TimerHandle_PrimaryAttack;
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	TSubclassOf<ASProjectileBase> DashProjectile;
+	
 
 protected:
 	// Called when the game starts or when spawned
@@ -69,6 +72,8 @@ protected:
 	void SwitchMagicProjectile();
 
 	void SwitchBlackholeProjectile();
+
+	void SwitchDashProjectile();
 
 	FRotator CalcProjectileSpawnRotation(FVector HandLocation);
 
