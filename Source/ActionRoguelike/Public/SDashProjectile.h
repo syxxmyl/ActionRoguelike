@@ -19,20 +19,15 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void PostInitializeComponents() override;
+	virtual void Explode_Implementation() override;
 
-	UPROPERTY(EditAnywhere, Category = "Projectile")
-	float ProjectileDestoryDelayTime;
+	void TeleportInstigator();
 
-	FTimerHandle TimerHandle_NormalDestory;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	void NormalDestory();
-
-	UFUNCTION()
-	void OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
-
+	UPROPERTY(EditDefaultsOnly, Category = "Teleport")
+	float DetonateDelay;
+	UPROPERTY(EditDefaultsOnly, Category = "Teleport")
+	float TeleportDelay;
+	
+	FTimerHandle TimerHandle_Detonate;
 };

@@ -99,12 +99,16 @@ void ASCharacter::PrimaryAttack()
 
 void ASCharacter::PrimaryAttack_TimeElapsed()
 {
+	GetWorldTimerManager().ClearTimer(TimerHandle_PrimaryAttack);
+
 	// 获取骨骼插槽为"Muzzle_01"的坐标，这样子弹就不是从玩家中心点发射
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 	FTransform SpwanTM = FTransform(CalcProjectileSpawnRotation(HandLocation), HandLocation);
+
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Instigator = this;
+
 	if (ensure(ClassToSpawn))
 	{
 		GetWorld()->SpawnActor<ASProjectileBase>(ClassToSpawn, SpwanTM, SpawnParams);
@@ -150,14 +154,25 @@ FRotator ASCharacter::CalcProjectileSpawnRotation(FVector HandLocation)
 	FCollisionObjectQueryParams ObjectQueryParams; 
 	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
 	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn); 
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_PhysicsBody);
 
-	FVector TraceBeginLocation = CameraComp->GetComponentLocation();
+	// 防止贴墙/抬头摄像机贴着地面 的时候碰撞检测到墙/地面 
+	FVector TraceBeginLocation = CameraComp->GetComponentLocation() + GetControlRotation().Vector() * 20;
 	FVector TraceEndLocation = TraceBeginLocation + GetControlRotation().Vector() * 5000;
+	// DrawDebugLine(GetWorld(), TraceBeginLocation, TraceEndLocation, FColor::Green, false, 10.0f, 0, 2.0f);
 
+
+	FCollisionShape Shape;
+	Shape.SetSphere(20.0f);
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	
 	FRotator SpawnRotation;
 
 	FHitResult Hit;
-	bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit, TraceBeginLocation, TraceEndLocation, ObjectQueryParams);
+	bool bBlockingHit = GetWorld()->SweepSingleByObjectType(Hit, TraceBeginLocation, TraceEndLocation, FQuat::Identity, ObjectQueryParams, Shape, Params);
 	if (bBlockingHit)
 	{
 		TraceEndLocation = Hit.ImpactPoint;
@@ -165,7 +180,7 @@ FRotator ASCharacter::CalcProjectileSpawnRotation(FVector HandLocation)
 
 	// SpawnRotation =  FRotationMatrix::MakeFromX(TraceEndLocation - HandLocation).Rotator();
 	SpawnRotation = FindLookAtRotation(TraceEndLocation - HandLocation);
-	DrawDebugLine(GetWorld(), HandLocation, TraceEndLocation, FColor::Red, false, 2.0f, 0, 2.0f);
+	DrawDebugLine(GetWorld(), HandLocation, TraceEndLocation, FColor::Red, false, 10.0f, 0, 2.0f);
 	return SpawnRotation;
 }
 

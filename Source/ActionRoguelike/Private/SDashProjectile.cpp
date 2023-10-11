@@ -2,7 +2,9 @@
 
 
 #include "SDashProjectile.h"
-#include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 
 // Sets default values
@@ -10,9 +12,10 @@ ASDashProjectile::ASDashProjectile()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	ProjectileDestoryDelayTime = 0.2f;
+	DetonateDelay = 0.2f;
+	TeleportDelay = 0.2f;
 
-	SphereComp->SetCollisionObjectType(ECC_WorldStatic);
+	MovementComp->InitialSpeed = 5000.0f;
 }
 
 // Called when the game starts or when spawned
@@ -20,40 +23,31 @@ void ASDashProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APawn* MyOwner = GetInstigator();
-	SphereComp->IgnoreActorWhenMoving(MyOwner, true);
-	
-	GetWorldTimerManager().SetTimer(TimerHandle_NormalDestory, this, &ASDashProjectile::NormalDestory, ProjectileDestoryDelayTime);
+	GetWorldTimerManager().SetTimer(TimerHandle_Detonate, this, &ASDashProjectile::Explode_Implementation, DetonateDelay);
 }
 
-// Called every frame
-void ASDashProjectile::Tick(float DeltaTime)
+void ASDashProjectile::Explode_Implementation()
 {
-	Super::Tick(DeltaTime);
+	GetWorldTimerManager().ClearTimer(TimerHandle_Detonate);
 
-}
-
-void ASDashProjectile::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-
-	SphereComp->OnComponentHit.AddDynamic(this, &ASDashProjectile::OnActorHit);
-}
-
-
-void ASDashProjectile::NormalDestory()
-{
-	APawn* MyOwner = GetInstigator();
-	if (ensure(MyOwner))
+	if (ImpactVFX)
 	{
-		FVector DashLocation = GetActorLocation();
-		MyOwner->SetActorLocation(DashLocation);
+		UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
 	}
 
-	Destroy();
+	EffectComp->DeactivateSystem();
+	MovementComp->StopMovementImmediately();
+	SetActorEnableCollision(false);
+
+	FTimerHandle TimerHandle_Teleport;
+	GetWorldTimerManager().SetTimer(TimerHandle_Teleport, this, &ASDashProjectile::TeleportInstigator, TeleportDelay);
 }
 
-void ASDashProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+void ASDashProjectile::TeleportInstigator()
 {
-	NormalDestory();
+	APawn* MyOwner = GetInstigator();
+	if (MyOwner)
+	{
+		MyOwner->TeleportTo(GetActorLocation(), MyOwner->GetActorRotation());
+	}
 }
