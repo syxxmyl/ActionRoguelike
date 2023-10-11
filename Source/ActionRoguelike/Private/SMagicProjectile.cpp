@@ -6,18 +6,13 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "SAttributeComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ASMagicProjectile::ASMagicProjectile()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	// 只对Pawn的Overlap事件有反应
-	// SphereComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-	// SphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-
-	//SphereComp->SetCollisionObjectType(ECC_WorldDynamic);
 
 	// 子弹生存时间
 	InitialLifeSpan = 3.0f;

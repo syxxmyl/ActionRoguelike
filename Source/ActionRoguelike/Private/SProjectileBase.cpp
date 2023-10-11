@@ -6,6 +6,8 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundCue.h"
 
 // Sets default values
 ASProjectileBase::ASProjectileBase()
@@ -28,6 +30,19 @@ ASProjectileBase::ASProjectileBase()
 	MovementComp->bRotationFollowsVelocity = true;
 	MovementComp->bInitialVelocityInLocalSpace = true;
 	MovementComp->ProjectileGravityScale = 0.0f;
+
+	AudioComp = CreateDefaultSubobject<UAudioComponent>("AudioComp");
+	AudioComp->SetupAttachment(RootComponent);
+
+	ImpactSoundComp = CreateDefaultSubobject<USoundCue>("ImpactSoundComp");
+}
+
+// Called when the game starts or when spawned
+void ASProjectileBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	AudioComp->Activate();
 }
 
 void ASProjectileBase::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -45,11 +60,16 @@ void ASProjectileBase::PostInitializeComponents()
 void ASProjectileBase::Explode_Implementation()
 {
 	// 确保只生成一次，因为生成一次就会走Destory()标记为删除了
-	if (ensure(!IsValid(this)))
+	if (IsValid(this))
 	{
-		if (ensure(ImpactVFX))
+		if (ImpactVFX)
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
+		}
+
+		if (ImpactSoundComp)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, ImpactSoundComp, GetActorLocation());
 		}
 
 		EffectComp->DeactivateSystem();
