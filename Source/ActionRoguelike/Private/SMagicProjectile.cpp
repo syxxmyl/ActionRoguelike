@@ -21,6 +21,7 @@ ASMagicProjectile::ASMagicProjectile()
 
 	// 子弹生存时间
 	InitialLifeSpan = 3.0f;
+	DamageAmount = 20.0f;
 }
 
 // Called when the game starts or when spawned
@@ -44,7 +45,7 @@ void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
 		if (AttributeComp)
 		{
-			AttributeComp->ApplyHealthChange(-20.0f);
+			AttributeComp->ApplyHealthChange(-DamageAmount);
 
 			Destroy();
 		}
