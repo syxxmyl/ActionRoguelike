@@ -57,6 +57,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	USAttributeComponent* AttributeComp;
+
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	FName HandLocationSocketName;
+
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	FName HitFlashParamName;
 	
 
 protected:

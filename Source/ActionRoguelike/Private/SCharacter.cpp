@@ -32,6 +32,10 @@ ASCharacter::ASCharacter()
 	bUseControllerRotationYaw = false;
 
 	ProjectileSpawnDelayTime = 0.2f;
+
+	HitFlashParamName = "LastHitTime";
+
+	HandLocationSocketName = "Muzzle_01";
 }
 
 void ASCharacter::PostInitializeComponents()
@@ -109,7 +113,7 @@ void ASCharacter::PrimaryAttack_TimeElapsed()
 	GetWorldTimerManager().ClearTimer(TimerHandle_PrimaryAttack);
 
 	// 获取骨骼插槽为"Muzzle_01"的坐标，这样子弹就不是从玩家中心点发射
-	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+	FVector HandLocation = GetMesh()->GetSocketLocation(HandLocationSocketName);
 	FTransform SpwanTM = FTransform(CalcProjectileSpawnRotation(HandLocation), HandLocation);
 
 	FActorSpawnParameters SpawnParams;
@@ -193,6 +197,11 @@ FRotator ASCharacter::CalcProjectileSpawnRotation(FVector HandLocation)
 
 void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
 {
+	if (Delta < 0.0f)
+	{
+		GetMesh()->SetScalarParameterValueOnMaterials(HitFlashParamName, GetWorld()->GetTimeSeconds());
+	}
+
 	if (NewHealth <= 0.0f && Delta < 0.0f)
 	{
 		APlayerController* PlayerController = Cast<APlayerController>(GetController());

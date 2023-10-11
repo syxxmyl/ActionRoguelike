@@ -27,6 +27,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* MeshComp;
+
+	UPROPERTY(EditAnywhere, Category = "Hit")
+	FName HitFlashParamName;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

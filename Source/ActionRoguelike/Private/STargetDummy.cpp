@@ -16,6 +16,8 @@ ASTargetDummy::ASTargetDummy()
 
 	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
 	AttributeComp->OnHealthChanged.AddDynamic(this, &ASTargetDummy::OnHealthChanged);
+
+	HitFlashParamName = "TimeToHit";
 }
 
 // Called when the game starts or when spawned
@@ -37,7 +39,7 @@ void ASTargetDummy::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
 	// 代表受到了伤害，展现一种材质，以后受到治疗可以展现其他样式的材质
 	if (Delta < 0.0f)
 	{
-		MeshComp->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->GetTimeSeconds());
+		MeshComp->SetScalarParameterValueOnMaterials(HitFlashParamName, GetWorld()->GetTimeSeconds());
 	}
 }
 
