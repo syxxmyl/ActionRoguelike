@@ -13,6 +13,7 @@ class UProjectileMovementComponent;
 class UParticleSystemComponent;
 class UAudioComponent;
 class USoundCue;
+class UCameraShakeBase;
 
 UCLASS(ABSTRACT)
 class ACTIONROGUELIKE_API ASProjectileBase : public AActor
@@ -50,6 +51,15 @@ protected:
 	// 处理命中音效
 	UPROPERTY(EditAnywhere, Category = "Components")
 	USoundCue* ImpactSoundComp;
+
+	UPROPERTY(EditAnywhere, Category = "HitCameraShake")
+	TSubclassOf<UCameraShakeBase> ImpactCameraShake;
+
+	UPROPERTY(EditAnywhere, Category = "HitCameraShake")
+	float InnerRadius;
+
+	UPROPERTY(EditAnywhere, Category = "HitCameraShake")
+	float OuterRadius;
 
 	UFUNCTION()
 	virtual void OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);

@@ -8,6 +8,8 @@
 #include "SProjectileBase.h"
 #include "SInteractionComponent.h"
 #include "SAttributeComponent.h"
+#include "Particles/ParticleSystem.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values
@@ -104,6 +106,11 @@ void ASCharacter::MoveRight(float value)
 void ASCharacter::PrimaryAttack()
 {
 	PlayAnimMontage(PrimaryAttackAnim);
+
+	if (AttachedEffect)
+	{
+		UGameplayStatics::SpawnEmitterAttached(AttachedEffect, GetMesh(), HandLocationSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
+	}
 
 	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttack_TimeElapsed, ProjectileSpawnDelayTime);
 }

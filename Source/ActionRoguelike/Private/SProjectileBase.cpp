@@ -35,6 +35,9 @@ ASProjectileBase::ASProjectileBase()
 	AudioComp->SetupAttachment(RootComponent);
 
 	ImpactSoundComp = CreateDefaultSubobject<USoundCue>("ImpactSoundComp");
+
+	InnerRadius = 200.0f;
+	OuterRadius = 2000.0f;
 }
 
 // Called when the game starts or when spawned
@@ -70,6 +73,11 @@ void ASProjectileBase::Explode_Implementation()
 		if (ImpactSoundComp)
 		{
 			UGameplayStatics::PlaySoundAtLocation(this, ImpactSoundComp, GetActorLocation());
+		}
+
+		if (ensure(ImpactCameraShake))
+		{
+			UGameplayStatics::PlayWorldCameraShake(this, ImpactCameraShake, GetActorLocation(), InnerRadius, OuterRadius);
 		}
 
 		EffectComp->DeactivateSystem();

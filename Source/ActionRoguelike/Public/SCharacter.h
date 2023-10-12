@@ -13,6 +13,7 @@ class ASProjectileBase;
 class USInteractionComponent;
 class UAnimMontage;
 class USAttributeComponent;
+class UParticleSystem;
 
 UCLASS()
 class ACTIONROGUELIKE_API ASCharacter : public ACharacter
@@ -55,11 +56,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<ASProjectileBase> DashProjectile;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
-	USAttributeComponent* AttributeComp;
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	UParticleSystem* AttachedEffect;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	FName HandLocationSocketName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	USAttributeComponent* AttributeComp;
 
 	UPROPERTY(EditAnywhere, Category = "Hit")
 	FName HitFlashParamName;
