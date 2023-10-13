@@ -23,6 +23,8 @@ protected:
 
 	virtual void PostInitializeComponents() override;
 
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
 
 	UPROPERTY(EditAnyWhere, Category = "Components")
 	UPawnSensingComponent* PawnSensingComp;
