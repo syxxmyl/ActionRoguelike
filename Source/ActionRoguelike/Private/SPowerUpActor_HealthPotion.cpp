@@ -54,7 +54,7 @@ void ASPowerUpActor_HealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 
 	if (PowerUp())
 	{
-		AttributeComp->ApplyHealthChange(AddHealthAmount);
+		AttributeComp->ApplyHealthChange(this, AddHealthAmount);
 	}
 }
 

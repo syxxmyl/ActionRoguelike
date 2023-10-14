@@ -11,12 +11,12 @@ USAttributeComponent::USAttributeComponent()
 }
 
 
-bool USAttributeComponent::ApplyHealthChange(float Delta)
+bool USAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
 {
 	float OldHealth = Health;
 	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
 	float RealDelta = Health - OldHealth;
-	OnHealthChanged.Broadcast(nullptr, this, Health, RealDelta);
+	OnHealthChanged.Broadcast(InstigatorActor, this, Health, RealDelta);
 	return RealDelta != 0;
 }
 

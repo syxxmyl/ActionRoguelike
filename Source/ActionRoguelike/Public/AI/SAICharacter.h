@@ -26,12 +26,16 @@ protected:
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
 
+	UFUNCTION()
+	void OnPawnSeen(APawn* Pawn);
+
+	void SetTargetActor(AActor* TargetActor);
+
+protected:
+
 	UPROPERTY(EditAnyWhere, Category = "Components")
 	UPawnSensingComponent* PawnSensingComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	USAttributeComponent* AttributeComp;
-
-	UFUNCTION()
-	void OnPawnSeen(APawn* Pawn);
 };
