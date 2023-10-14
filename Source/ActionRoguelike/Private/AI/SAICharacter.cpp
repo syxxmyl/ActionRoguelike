@@ -18,6 +18,8 @@ ASAICharacter::ASAICharacter()
     AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
 
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+    HitFlashParamName = "LastHitTime";
 }
 
 void ASAICharacter::PostInitializeComponents()
@@ -32,6 +34,8 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
 {
     if (Delta < 0.0f)
     {
+        GetMesh()->SetScalarParameterValueOnMaterials(HitFlashParamName, GetWorld()->GetTimeSeconds());
+
         if (InstigatorActor && InstigatorActor != this)
         {
             SetTargetActor(InstigatorActor);
