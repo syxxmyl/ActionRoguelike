@@ -10,7 +10,6 @@ USAttributeComponent::USAttributeComponent()
 	HealthMax = 100.0f;
 }
 
-
 bool USAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
 {
 	float OldHealth = Health;
@@ -33,5 +32,26 @@ float USAttributeComponent::GetHealthMax() const
 float USAttributeComponent::GetHealth() const
 {
 	return Health;
+}
+
+USAttributeComponent* USAttributeComponent::GetAttributes(AActor* FromActor)
+{
+	if (FromActor)
+	{
+		return Cast<USAttributeComponent>(FromActor->GetComponentByClass(USAttributeComponent::StaticClass()));
+	}
+
+	return nullptr;
+}
+
+bool USAttributeComponent::IsActorAlive(AActor* Actor)
+{
+	USAttributeComponent* AttributeComp = GetAttributes(Actor);
+	if (AttributeComp)
+	{
+		return AttributeComp->GetHealth() > 0.0f;
+	}
+
+	return false;
 }
 

@@ -20,7 +20,7 @@ void USBTService_CheckLowHealth::TickNode(UBehaviorTreeComponent& OwnerComp, uin
 			ASAICharacter* AICharacter = Cast<ASAICharacter>(AIController->GetPawn());
 			if (ensure(AICharacter))
 			{
-				USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(AICharacter->GetComponentByClass(USAttributeComponent::StaticClass()));
+				USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(AICharacter);
 				if (AttributeComp)
 				{
 					float HealthScale = AttributeComp->GetHealth() / AttributeComp->GetHealthMax();

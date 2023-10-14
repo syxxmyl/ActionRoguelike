@@ -20,7 +20,7 @@ EBTNodeResult::Type USBTTaskNode_Heal::ExecuteTask(UBehaviorTreeComponent& Owner
 		
 		if (ensure(AICharacter))
 		{
-			USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(AICharacter->GetComponentByClass(USAttributeComponent::StaticClass()));
+			USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(AICharacter);
 			if (AttributeComp)
 			{
 				return AttributeComp->ApplyHealthChange(AICharacter, AttributeComp->GetHealthMax()) ? EBTNodeResult::Succeeded : EBTNodeResult::Failed;

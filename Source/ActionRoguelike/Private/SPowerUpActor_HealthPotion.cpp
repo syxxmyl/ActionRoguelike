@@ -41,7 +41,7 @@ void ASPowerUpActor_HealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 		return;
 	}
 
-	USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(GamePlayer->GetComponentByClass(USAttributeComponent::StaticClass()));
+	USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(GamePlayer);
 	if (!AttributeComp)
 	{
 		return;
