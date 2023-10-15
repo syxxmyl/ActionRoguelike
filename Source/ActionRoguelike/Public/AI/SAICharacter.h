@@ -9,6 +9,8 @@
 
 class UPawnSensingComponent;
 class USAttributeComponent;
+class UUserWidget;
+class USWorldUserWidget;
 
 UCLASS()
 class ACTIONROGUELIKE_API ASAICharacter : public ACharacter
@@ -41,4 +43,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Effect")
 	FName HitFlashParamName;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> HealthBarWidgetClass;
+
+	USWorldUserWidget* ActiveHealthBar;
 };
