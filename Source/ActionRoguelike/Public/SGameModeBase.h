@@ -12,6 +12,7 @@ class UEnvQuery;
 class UEnvQueryInstanceBlueprintWrapper;
 class ASAICharacter;
 class UCurveFloat;
+class ASPowerUpActor;
 
 /**
  * 
@@ -38,10 +39,16 @@ protected:
 	void SpawnBotTimerElapsed();
 
 	UFUNCTION()
-	void OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+	void OnSpawnBotQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 
 	UFUNCTION()
 	void RespawnPlayerElapsed(AController* Controller);
+
+	UFUNCTION()
+	void SpawnPowerUpActorTimerElapsed();
+
+	UFUNCTION()
+	void OnSpawnPowerUpActorQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 
 	void TryToRespawnPlayer(AActor* VictimActor);
 
@@ -55,7 +62,7 @@ protected:
 	FTimerHandle TimerHandle_SpawnBot;
 
 	UPROPERTY(EditAnywhere, Category = "AI")
-	float SpawnTimerInterval;
+	float SpawnBotTimerInterval;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	TSubclassOf<ASAICharacter> MinionClass;
@@ -69,4 +76,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Credit")
 	float KillMinionObtainCreditAmount;
 
+	FTimerHandle TimerHandle_SpawnPowerUpActor;
+
+	UPROPERTY(EditDefaultsOnly, Category = "PowerUpActor")
+	UEnvQuery* SpawnPowerUpActorQuery;
+
+	UPROPERTY(EditDefaultsOnly, Category = "PowerUpActor")
+	float PowerUpActorAmount;
+
+	UPROPERTY(EditDefaultsOnly, Category = "PowerUpActor")
+	TArray<TSubclassOf<ASPowerUpActor>> PowerUpActorClasses;
+
+	UPROPERTY(EditDefaultsOnly, Category = "PowerUpActor")
+	float SpawnPowerUpActorTimerInterval;
 };

@@ -11,22 +11,28 @@
 #include "DrawDebugHelpers.h"
 #include "SCharacter.h"
 #include "SPlayerState.h"
+#include "SPowerUpActor.h"
 
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT("Enable Spawning of Bots via Timer"), ECVF_Cheat);
 
 ASGameModeBase::ASGameModeBase()
 {
-	SpawnTimerInterval = 2.0f;
+	SpawnBotTimerInterval = 2.0f;
 	PlayerRespawnTimerInterval = 2.0f;
 	KillMinionObtainCreditAmount = 20.0f;
+
+	PowerUpActorAmount = 5.0f;
+	SpawnPowerUpActorTimerInterval = 1.0f;
 }
 
 void ASGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 
-	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBot, this, &ASGameModeBase::SpawnBotTimerElapsed, SpawnTimerInterval, true);
+	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBot, this, &ASGameModeBase::SpawnBotTimerElapsed, SpawnBotTimerInterval, true);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_SpawnPowerUpActor, this, &ASGameModeBase::SpawnPowerUpActorTimerElapsed, SpawnPowerUpActorTimerInterval, false);
 }
 
 void ASGameModeBase::KillAll()
@@ -79,11 +85,11 @@ void ASGameModeBase::SpawnBotTimerElapsed()
 
 	if (ensure(QueryInstance))
 	{
-		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ASGameModeBase::OnQueryCompleted);
+		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ASGameModeBase::OnSpawnBotQueryCompleted);
 	}
 }
 
-void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
+void ASGameModeBase::OnSpawnBotQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
 {
 	if (QueryStatus != EEnvQueryStatus::Success)
 	{
@@ -109,6 +115,45 @@ void ASGameModeBase::RespawnPlayerElapsed(AController* Controller)
 	{
 		Controller->UnPossess();
 		RestartPlayer(Controller);
+	}
+}
+
+void ASGameModeBase::SpawnPowerUpActorTimerElapsed()
+{
+	UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this, SpawnPowerUpActorQuery, this, EEnvQueryRunMode::AllMatching, nullptr);
+
+	if (ensure(QueryInstance))
+	{
+		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ASGameModeBase::OnSpawnPowerUpActorQueryCompleted);
+	}
+}
+
+void ASGameModeBase::OnSpawnPowerUpActorQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
+{
+	if (QueryStatus != EEnvQueryStatus::Success)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spawn PowerUpActor EQS Query Failed!"));
+		return;
+	}
+
+	TArray<FVector>Locations = QueryInstance->GetResultsAsLocations();
+
+	int32 TotalLoopNum = FMath::Min(PowerUpActorAmount, Locations.Num());
+
+	int32 TotalSpawnNum = 0;
+	while (TotalSpawnNum < PowerUpActorAmount && Locations.Num() > 0)
+	{
+		int32 RandomLocationIdx = FMath::RandRange(0, Locations.Num() - 1);
+		FVector SelectedLocation = Locations[RandomLocationIdx];
+		Locations.RemoveAt(RandomLocationIdx);
+
+		FActorSpawnParameters SpawnParams;
+		int32 RandomActor = FMath::RandRange(0, PowerUpActorClasses.Num() - 1);
+		ASPowerUpActor* SpawnActor = GetWorld()->SpawnActor<ASPowerUpActor>(PowerUpActorClasses[RandomActor], SelectedLocation, FRotator::ZeroRotator);
+		if (SpawnActor)
+		{
+			++TotalSpawnNum;
+		}
 	}
 }
 
