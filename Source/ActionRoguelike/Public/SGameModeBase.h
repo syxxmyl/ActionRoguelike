@@ -43,6 +43,10 @@ protected:
 	UFUNCTION()
 	void RespawnPlayerElapsed(AController* Controller);
 
+	void TryToRespawnPlayer(AActor* VictimActor);
+
+	void TryToAddCredits(AActor* VictimActor, AActor* Killer);
+
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
@@ -61,5 +65,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Respawn")
 	float PlayerRespawnTimerInterval;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Credit")
+	float KillMinionObtainCreditAmount;
 
 };

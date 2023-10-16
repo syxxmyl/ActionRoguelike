@@ -17,6 +17,6 @@ bool ASPlayerState::ApplyCreditChange(float Delta)
 
 	Credit += Delta;
 	OnCreditChanged.Broadcast(this, Credit, Delta);
-
+	UE_LOG(LogTemp, Log, TEXT("ApplyCreditChange: Credit is %f, Delta is %f"), Credit, Delta);
 	return true;
 }

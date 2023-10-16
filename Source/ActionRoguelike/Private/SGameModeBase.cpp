@@ -10,6 +10,7 @@
 #include "EngineUtils.h"
 #include "DrawDebugHelpers.h"
 #include "SCharacter.h"
+#include "SPlayerState.h"
 
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT("Enable Spawning of Bots via Timer"), ECVF_Cheat);
@@ -18,6 +19,7 @@ ASGameModeBase::ASGameModeBase()
 {
 	SpawnTimerInterval = 2.0f;
 	PlayerRespawnTimerInterval = 2.0f;
+	KillMinionObtainCreditAmount = 20.0f;
 }
 
 void ASGameModeBase::StartPlay()
@@ -110,7 +112,7 @@ void ASGameModeBase::RespawnPlayerElapsed(AController* Controller)
 	}
 }
 
-void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
+void ASGameModeBase::TryToRespawnPlayer(AActor* VictimActor)
 {
 	ASCharacter* Player = Cast<ASCharacter>(VictimActor);
 	if (Player)
@@ -120,6 +122,38 @@ void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 		Delegate.BindUFunction(this, "RespawnPlayerElapsed", Player->GetController());
 		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, Delegate, PlayerRespawnTimerInterval, false);
 	}
+}
+
+void ASGameModeBase::TryToAddCredits(AActor* VictimActor, AActor* Killer)
+{
+	ASCharacter* Player = Cast<ASCharacter>(Killer);
+	if (!Player)
+	{
+		return;
+	}
+
+	ASAICharacter* MinionBot = Cast<ASAICharacter>(VictimActor);
+	if (!MinionBot)
+	{	
+		return;
+	}
+
+	ASPlayerState* PlayerState = Cast<ASPlayerState>(Player->GetPlayerState());
+	if (!PlayerState)
+	{
+		return;
+	}
+
+	PlayerState->ApplyCreditChange(KillMinionObtainCreditAmount);
+}
+
+void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
+{
+	TryToRespawnPlayer(VictimActor);
+
+	TryToAddCredits(VictimActor, Killer);
+
+	
 
 	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim is %s, Killer is %s"), *GetNameSafe(VictimActor), *GetNameSafe(Killer));
 }
