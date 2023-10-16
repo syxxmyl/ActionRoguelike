@@ -14,6 +14,7 @@ class USInteractionComponent;
 class UAnimMontage;
 class USAttributeComponent;
 class UParticleSystem;
+class USActionComponent;
 
 UCLASS()
 class ACTIONROGUELIKE_API ASCharacter : public ACharacter
@@ -60,6 +61,10 @@ protected:
 
 	void SwitchDashProjectile();
 
+	void SprintStart();
+
+	void SprintStop();
+
 	FRotator CalcProjectileSpawnRotation(FVector HandLocation);	
 
 protected:
@@ -99,10 +104,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	FName HandLocationSocketName;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USAttributeComponent* AttributeComp;
 
 	UPROPERTY(EditAnywhere, Category = "Hit")
 	FName HitFlashParamName;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USActionComponent* ActionComp;
 
 };
