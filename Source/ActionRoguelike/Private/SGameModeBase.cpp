@@ -138,7 +138,7 @@ void ASGameModeBase::TryToAddCredits(AActor* VictimActor, AActor* Killer)
 		return;
 	}
 
-	ASPlayerState* PlayerState = Cast<ASPlayerState>(Player->GetPlayerState());
+	ASPlayerState* PlayerState = ASPlayerState::GetPlayerState(Player);
 	if (!PlayerState)
 	{
 		return;

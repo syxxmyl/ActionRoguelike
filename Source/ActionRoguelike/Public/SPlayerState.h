@@ -21,7 +21,14 @@ class ACTIONROGUELIKE_API ASPlayerState : public APlayerState
 public:
 	ASPlayerState();
 
+	UFUNCTION(BlueprintCallable, Category = "PlayerState")
 	bool ApplyCreditChange(float Delta);
+
+	UFUNCTION(BlueprintCallable, Category = "PlayerState")
+	bool CheckEnoughCredit(float Delta);
+
+	UFUNCTION(BlueprintCallable, Category = "PlayerState")
+	static ASPlayerState* GetPlayerState(APawn* FromActor);
 
 protected:
 	UPROPERTY(VisibleAnyWhere, Category = "PlayerState")

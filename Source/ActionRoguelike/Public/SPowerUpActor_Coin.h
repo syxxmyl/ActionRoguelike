@@ -4,29 +4,28 @@
 
 #include "CoreMinimal.h"
 #include "SPowerUpActor.h"
-#include "SPowerUpActor_HealthPotion.generated.h"
+#include "SPowerUpActor_Coin.generated.h"
 
-class UStaticMeshComponent;
-
+/**
+ * 
+ */
 UCLASS()
-class ACTIONROGUELIKE_API ASPowerUpActor_HealthPotion : public ASPowerUpActor
+class ACTIONROGUELIKE_API ASPowerUpActor_Coin : public ASPowerUpActor
 {
 	GENERATED_BODY()
 	
-public:	
+public:
 	// Sets default values for this actor's properties
-	ASPowerUpActor_HealthPotion();
+	ASPowerUpActor_Coin();
 
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
+
 
 protected:
 
 	UPROPERTY(EditAnywhere, Category = "Components")
 	UStaticMeshComponent* MeshComp;
 
-	UPROPERTY(EditAnywhere, Category = "Health")
-	float AddHealthAmount;	
-
-	UPROPERTY(EditAnywhere, Category = "Health|Cost")
-	float ConsumeCreditAmount;
+	UPROPERTY(EditAnywhere, Category = "Credit")
+	float ObtainCreditAmount;
 };

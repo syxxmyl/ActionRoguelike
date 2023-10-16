@@ -4,6 +4,7 @@
 #include "SPowerUpActor_HealthPotion.h"
 #include "SCharacter.h"
 #include "SAttributeComponent.h"
+#include "SPlayerState.h"
 
 // Sets default values
 ASPowerUpActor_HealthPotion::ASPowerUpActor_HealthPotion()
@@ -16,21 +17,7 @@ ASPowerUpActor_HealthPotion::ASPowerUpActor_HealthPotion()
 	MeshComp->SetupAttachment(RootComponent);
 
 	AddHealthAmount = 40.0f;
-
-}
-
-// Called when the game starts or when spawned
-void ASPowerUpActor_HealthPotion::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void ASPowerUpActor_HealthPotion::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
+	ConsumeCreditAmount = 20.0f;
 }
 
 void ASPowerUpActor_HealthPotion::Interact_Implementation(APawn* InstigatorPawn)
@@ -52,9 +39,15 @@ void ASPowerUpActor_HealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 		return;
 	}
 
+	ASPlayerState* PlayerState = ASPlayerState::GetPlayerState(GamePlayer);
+	if (!PlayerState || !PlayerState->CheckEnoughCredit(-ConsumeCreditAmount))
+	{
+		return;
+	}
+
 	if (PowerUp())
 	{
+		PlayerState->ApplyCreditChange(-ConsumeCreditAmount);
 		AttributeComp->ApplyHealthChange(this, AddHealthAmount);
 	}
 }
-
