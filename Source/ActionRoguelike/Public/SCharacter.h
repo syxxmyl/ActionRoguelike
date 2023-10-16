@@ -9,11 +9,8 @@
 
 class USpringArmComponent;
 class UCameraComponent;
-class ASProjectileBase;
 class USInteractionComponent;
-class UAnimMontage;
 class USAttributeComponent;
-class UParticleSystem;
 class USActionComponent;
 
 UCLASS()
@@ -51,21 +48,17 @@ protected:
 
 	void PrimaryAttack();
 
-	void PrimaryAttack_TimeElapsed();
-
 	void PrimaryInteract();
+
+	void SprintStart();
+
+	void SprintStop();
 
 	void SwitchMagicProjectile();
 
 	void SwitchBlackholeProjectile();
 
 	void SwitchDashProjectile();
-
-	void SprintStart();
-
-	void SprintStop();
-
-	FRotator CalcProjectileSpawnRotation(FVector HandLocation);	
 
 protected:
 
@@ -78,32 +71,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "PrimaryInteract")
 	USInteractionComponent* InteractionComp;
 
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	UAnimMontage* PrimaryAttackAnim;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	float ProjectileSpawnDelayTime;
-
-	FTimerHandle TimerHandle_PrimaryAttack;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<ASProjectileBase> ClassToSpawn;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<ASProjectileBase> PrimaryAttackProjectile;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<ASProjectileBase> BlackholeProjectile;
-	
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<ASProjectileBase> DashProjectile;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	UParticleSystem* AttachedEffect;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	FName HandLocationSocketName;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USAttributeComponent* AttributeComp;
 
@@ -112,5 +79,8 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USActionComponent* ActionComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Attack")
+	FName PrimaryAttackClassName;
 
 };

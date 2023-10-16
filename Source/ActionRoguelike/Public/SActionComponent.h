@@ -37,6 +37,9 @@ protected:
 
 protected:
 
+	UPROPERTY(EditAnyWhere, Category = "Actions")
+	TArray<TSubclassOf<USAction>> DefaultActions;
+
 	UPROPERTY()
 	TArray<USAction*> Actions;
 	

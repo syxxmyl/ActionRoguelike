@@ -6,6 +6,9 @@
 #include "UObject/NoExportTypes.h"
 #include "SAction.generated.h"
 
+
+class UWorld;
+
 /**
  * 
  */
@@ -22,6 +25,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = "Action")
 	void StopAction(AActor* Instigator);
 
+	UWorld* GetWorld() const override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	FName ActionName;

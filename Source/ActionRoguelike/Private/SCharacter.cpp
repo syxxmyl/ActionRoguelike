@@ -5,7 +5,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "SProjectileBase.h"
 #include "SInteractionComponent.h"
 #include "SAttributeComponent.h"
 #include "Particles/ParticleSystem.h"
@@ -35,11 +34,7 @@ ASCharacter::ASCharacter()
 
 	bUseControllerRotationYaw = false;
 
-	ProjectileSpawnDelayTime = 0.2f;
-
-	HitFlashParamName = "LastHitTime";
-
-	HandLocationSocketName = "Muzzle_01";
+	PrimaryAttackClassName = "MagicProjectile";
 }
 
 void ASCharacter::PostInitializeComponents()
@@ -79,11 +74,11 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
-	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ASCharacter::PrimaryAttack);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	// PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASCharacter::PrimaryInteract);
+
+	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ASCharacter::PrimaryAttack);
 
 	PlayerInputComponent->BindAction("SwitchMagicProjectile", IE_Pressed, this, &ASCharacter::SwitchMagicProjectile);
 	PlayerInputComponent->BindAction("SwitchBlackholeProjectile", IE_Pressed, this, &ASCharacter::SwitchBlackholeProjectile);
@@ -118,34 +113,22 @@ void ASCharacter::MoveRight(float value)
 	AddMovementInput(RightVec, value);
 }
 
-void ASCharacter::PrimaryAttack()
+void ASCharacter::SwitchMagicProjectile()
 {
-	PlayAnimMontage(PrimaryAttackAnim);
-
-	if (AttachedEffect)
-	{
-		UGameplayStatics::SpawnEmitterAttached(AttachedEffect, GetMesh(), HandLocationSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
-	}
-
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttack_TimeElapsed, ProjectileSpawnDelayTime);
+	PrimaryAttackClassName = "MagicProjectile";
+}
+void ASCharacter::SwitchBlackholeProjectile()
+{
+	PrimaryAttackClassName = "BlackHoleProjectile";
+}
+void ASCharacter::SwitchDashProjectile()
+{
+	PrimaryAttackClassName = "DashProjectile";
 }
 
-void ASCharacter::PrimaryAttack_TimeElapsed()
+void ASCharacter::PrimaryAttack()
 {
-	GetWorldTimerManager().ClearTimer(TimerHandle_PrimaryAttack);
-
-	// 获取骨骼插槽为"Muzzle_01"的坐标，这样子弹就不是从玩家中心点发射
-	FVector HandLocation = GetMesh()->GetSocketLocation(HandLocationSocketName);
-	FTransform SpwanTM = FTransform(CalcProjectileSpawnRotation(HandLocation), HandLocation);
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-
-	if (ensure(ClassToSpawn))
-	{
-		GetWorld()->SpawnActor<ASProjectileBase>(ClassToSpawn, SpwanTM, SpawnParams);
-	}
+	ActionComp->StartActionByName(this, PrimaryAttackClassName);
 }
 
 void ASCharacter::PrimaryInteract()
@@ -156,21 +139,6 @@ void ASCharacter::PrimaryInteract()
 	}
 }
 
-void ASCharacter::SwitchMagicProjectile()
-{
-	ClassToSpawn = PrimaryAttackProjectile;
-}
-
-void ASCharacter::SwitchBlackholeProjectile()
-{
-	ClassToSpawn = BlackholeProjectile;
-}
-
-void ASCharacter::SwitchDashProjectile()
-{
-	ClassToSpawn = DashProjectile;
-}
-
 void ASCharacter::SprintStart()
 {
 	ActionComp->StartActionByName(this, "Sprint");
@@ -179,52 +147,6 @@ void ASCharacter::SprintStart()
 void ASCharacter::SprintStop()
 {
 	ActionComp->StopActionByName(this, "Sprint");
-}
-
-FRotator FindLookAtRotation(FVector const& X)
-{
-	// https://zhuanlan.zhihu.com/p/108474984
-	FVector const NewX = X.GetSafeNormal();
-	FVector const UpVector = (FMath::Abs(NewX.Z) < (1.f - KINDA_SMALL_NUMBER)) ? FVector(0, 0, 1.f) : FVector(1.f, 0, 0);//得到原坐标轴的Z轴方向
-	const FVector NewY = (UpVector ^ NewX).GetSafeNormal();//叉乘可得到Y'
-	const FVector NewZ = NewX ^ NewY;//再次将X'与Y'叉乘即可得到Z'
-
-	return FMatrix(NewX, NewY, NewZ, FVector::ZeroVector).Rotator();
-}
-
-FRotator ASCharacter::CalcProjectileSpawnRotation(FVector HandLocation)
-{
-	FCollisionObjectQueryParams ObjectQueryParams; 
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn); 
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_PhysicsBody);
-
-	// 防止贴墙/抬头摄像机贴着地面 的时候碰撞检测到墙/地面 
-	FVector TraceBeginLocation = CameraComp->GetComponentLocation() + GetControlRotation().Vector() * 20;
-	FVector TraceEndLocation = TraceBeginLocation + GetControlRotation().Vector() * 5000;
-	// DrawDebugLine(GetWorld(), TraceBeginLocation, TraceEndLocation, FColor::Green, false, 10.0f, 0, 2.0f);
-
-
-	FCollisionShape Shape;
-	Shape.SetSphere(20.0f);
-
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-	
-	FRotator SpawnRotation;
-
-	FHitResult Hit;
-	bool bBlockingHit = GetWorld()->SweepSingleByObjectType(Hit, TraceBeginLocation, TraceEndLocation, FQuat::Identity, ObjectQueryParams, Shape, Params);
-	if (bBlockingHit)
-	{
-		TraceEndLocation = Hit.ImpactPoint;
-	}
-
-	// SpawnRotation =  FRotationMatrix::MakeFromX(TraceEndLocation - HandLocation).Rotator();
-	SpawnRotation = FindLookAtRotation(TraceEndLocation - HandLocation);
-	DrawDebugLine(GetWorld(), HandLocation, TraceEndLocation, FColor::Red, false, 10.0f, 0, 2.0f);
-	return SpawnRotation;
 }
 
 void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
