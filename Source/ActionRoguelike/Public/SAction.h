@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "GameplayTagContainer.h"
 #include "SAction.generated.h"
 
 
 class UWorld;
+class USActionComponent;
 
 /**
  * 
@@ -30,4 +32,16 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	FName ActionName;
 
+protected:
+
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	USActionComponent* GetOwningComponent() const;
+
+protected:
+
+	UPROPERTY(EditDefaultsOnly, Category = "Tags")
+	FGameplayTagContainer GrantsTags;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Tags")
+	FGameplayTagContainer BlockedTags;
 };

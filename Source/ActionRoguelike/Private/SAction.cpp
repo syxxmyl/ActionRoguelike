@@ -7,11 +7,23 @@
 void USAction::StartAction_Implementation(AActor* Instigator)
 {
 	UE_LOG(LogTemp, Log, TEXT("Running: %s."), *GetNameSafe(this));
+
+	USActionComponent* Comp = GetOwningComponent();
+	if (Comp)
+	{
+		Comp->ActiveGameplayTags.AppendTags(GrantsTags);
+	}
 }
 
 void USAction::StopAction_Implementation(AActor* Instigator)
 {
 	UE_LOG(LogTemp, Log, TEXT("Stopped: %s."), *GetNameSafe(this));
+
+	USActionComponent* Comp = GetOwningComponent();
+	if (Comp)
+	{
+		Comp->ActiveGameplayTags.RemoveTags(GrantsTags);
+	}
 }
 
 UWorld* USAction::GetWorld() const
@@ -23,4 +35,9 @@ UWorld* USAction::GetWorld() const
 	}
 
 	return nullptr;
+}
+
+USActionComponent* USAction::GetOwningComponent() const
+{
+	return Cast<USActionComponent>(GetOuter());
 }
