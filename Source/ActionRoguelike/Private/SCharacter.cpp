@@ -160,6 +160,7 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 	if (Delta < 0.0f)
 	{
 		GetMesh()->SetScalarParameterValueOnMaterials(HitFlashParamName, GetWorld()->GetTimeSeconds());
+		AttributeComp->ApplyRageChange(InstigatorActor, -Delta);
 	}
 
 	if (NewHealth <= 0.0f && Delta < 0.0f)
