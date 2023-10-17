@@ -84,6 +84,16 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
 
 void ASAICharacter::OnPawnSeen(APawn* Pawn)
 {
+    if (CurrentTargetActor != Pawn)
+    {
+		USWorldUserWidget* PlayerSpottedWidget = CreateWidget<USWorldUserWidget>(GetWorld(), PlayerSpottedWidgetClass);
+		if (PlayerSpottedWidget)
+		{
+			PlayerSpottedWidget->BindAttachedActor(this);
+			PlayerSpottedWidget->AddToViewport();
+		}
+    }
+
     SetTargetActor(Pawn);
     DrawDebugString(GetWorld(), GetActorLocation(), "SET TARGET PLAYER", nullptr, FColor::White, 4.0f, true);
 }
@@ -95,5 +105,7 @@ void ASAICharacter::SetTargetActor(AActor* TargetActor)
 	{
 		AIController->GetBlackboardComponent()->SetValueAsObject("TargetActor", TargetActor);
 	}
+
+    CurrentTargetActor = TargetActor;
 }
 
