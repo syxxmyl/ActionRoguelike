@@ -7,7 +7,9 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "SAttributeComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "../Public/SGameplayFunctionLibrary.h"
+#include "SGameplayFunctionLibrary.h"
+#include "SActionComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values
 ASMagicProjectile::ASMagicProjectile()
@@ -18,13 +20,6 @@ ASMagicProjectile::ASMagicProjectile()
 	// 子弹生存时间
 	InitialLifeSpan = 3.0f;
 	DamageAmount = 20.0f;
-}
-
-// Called when the game starts or when spawned
-void ASMagicProjectile::BeginPlay()
-{
-	Super::BeginPlay();
-	
 }
 
 void ASMagicProjectile::PostInitializeComponents()
@@ -38,6 +33,16 @@ void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
+		// 另一种方式拿到GameplayTag
+		// static FGameplayTag ParryTag = FGameplayTag::RequestGameplayTag("Status.Parrying");
+		USActionComponent* ActionComp = USActionComponent::GetActions(OtherActor);
+		if (ActionComp && ActionComp->ActiveGameplayTags.HasTag(ParryTag))
+		{
+			MovementComp->Velocity *= -1;
+			SetInstigator(Cast<APawn>(OtherActor));
+			return;
+		}
+
 		if (USGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageAmount, SweepResult))
 		{
 			Explode();
@@ -45,11 +50,3 @@ void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 
 	}
 }
-
-// Called every frame
-void ASMagicProjectile::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-

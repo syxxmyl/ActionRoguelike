@@ -11,6 +11,7 @@ class UPawnSensingComponent;
 class USAttributeComponent;
 class UUserWidget;
 class USWorldUserWidget;
+class USActionComponent;
 
 UCLASS()
 class ACTIONROGUELIKE_API ASAICharacter : public ACharacter
@@ -48,4 +49,7 @@ protected:
 	TSubclassOf<UUserWidget> HealthBarWidgetClass;
 
 	USWorldUserWidget* ActiveHealthBar;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USActionComponent* ActionComp;
 };

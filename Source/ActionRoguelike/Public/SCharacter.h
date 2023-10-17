@@ -60,6 +60,8 @@ protected:
 
 	void SwitchDashProjectile();
 
+	void ParryStart();
+
 protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Camera")

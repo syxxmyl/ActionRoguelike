@@ -25,9 +25,18 @@ public:
 	ASProjectileBase();
 
 protected:
+	UFUNCTION()
+	virtual void OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	// BlueprintNativeEvent			C++和蓝图都可以编写逻辑，但是蓝图的优先级更高
+	// BlueprintCallable			C++编写逻辑，蓝图直接调用
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void Explode();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	virtual void PostInitializeComponents() override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	UParticleSystem* ImpactVFX;
@@ -60,14 +69,4 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "HitCameraShake")
 	float OuterRadius;
-
-	UFUNCTION()
-	virtual void OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
-	// BlueprintNativeEvent			C++和蓝图都可以编写逻辑，但是蓝图的优先级更高
-	// BlueprintCallable			C++编写逻辑，蓝图直接调用
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void Explode();
-
-	virtual void PostInitializeComponents() override;
 };

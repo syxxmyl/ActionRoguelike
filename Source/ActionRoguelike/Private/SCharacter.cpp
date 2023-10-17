@@ -86,6 +86,7 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ASCharacter::SprintStart);
 	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ASCharacter::SprintStop);
+	PlayerInputComponent->BindAction("Parry", IE_Pressed, this, &ASCharacter::ParryStart);
 }
 
 void ASCharacter::HealSelf(float Amount /*= 100.0f*/)
@@ -124,6 +125,11 @@ void ASCharacter::SwitchBlackholeProjectile()
 void ASCharacter::SwitchDashProjectile()
 {
 	PrimaryAttackClassName = "DashProjectile";
+}
+
+void ASCharacter::ParryStart()
+{
+	ActionComp->StartActionByName(this, "Parry");
 }
 
 void ASCharacter::PrimaryAttack()
