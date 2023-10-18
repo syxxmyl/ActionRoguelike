@@ -29,13 +29,16 @@ public:
 	void RemoveAction(USAction* ActionToRemove);
 
 	UFUNCTION(BlueprintCallable, Category = "Actions")
+	bool HasAction(TSubclassOf<USAction> ActionClass);
+
+	UFUNCTION(BlueprintCallable, Category = "Actions")
 	bool StartActionByName(AActor* Instigator, FName ActionName);
 
 	UFUNCTION(BlueprintCallable, Category = "Actions")
 	bool StopActionByName(AActor* Instigator, FName ActionName);
 
 	UFUNCTION(BlueprintCallable, Category = "Actions")
-	static USActionComponent* GetActions(AActor* FromActor);
+	static USActionComponent* GetActions(AActor* FromActor);	
 
 public:
 
