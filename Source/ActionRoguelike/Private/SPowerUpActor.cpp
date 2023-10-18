@@ -15,6 +15,8 @@ ASPowerUpActor::ASPowerUpActor()
 
 	PowerUpCDTime = 10.0f;
 	IsInCD = false;
+
+	SetReplicates(true);
 }
 
 void ASPowerUpActor::ResetCD()

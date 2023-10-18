@@ -3,6 +3,7 @@
 
 #include "SAttributeComponent.h"
 #include "../Public/SGameModeBase.h"
+#include "Net/UnrealNetwork.h"
 
 static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("su.DamageMultiplier"), 1.0f, TEXT("Global Damage Modifier For Attribute component"), ECVF_Cheat);
 
@@ -13,6 +14,8 @@ USAttributeComponent::USAttributeComponent()
 	HealthMax = 100.0f;
 	Rage = 0.0f;
 	RageMax = 50.0f;
+
+	SetIsReplicatedByDefault(true);
 }
 
 bool USAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
@@ -34,7 +37,11 @@ bool USAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delt
 	Delta = Delta * AmountMultiplier;
 	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
 	float RealDelta = Health - OldHealth;
-	OnHealthChanged.Broadcast(InstigatorActor, this, Health, RealDelta);
+	// OnHealthChanged.Broadcast(InstigatorActor, this, Health, RealDelta);
+	if (RealDelta != 0.0f)
+	{
+		MulticastHealthChanged(InstigatorActor, Health, RealDelta);
+	}
 
 	if (RealDelta < 0.0f && Health == 0.0f)
 	{
@@ -104,7 +111,31 @@ bool USAttributeComponent::ApplyRageChange(AActor* InstigatorActor, float Delta)
 	float OldRage = Rage;
 	Rage = FMath::Clamp(Rage + Delta, 0.0f, RageMax);
 	float RealDelta = Rage - OldRage;
-	OnRageChanged.Broadcast(InstigatorActor, this, Rage, RealDelta);
+	// OnRageChanged.Broadcast(InstigatorActor, this, Rage, RealDelta);
+	if (RealDelta != 0.0f)
+	{
+		MulticastRageChanged_Implementation(InstigatorActor, Rage, RealDelta);
+	}
 	return RealDelta != 0;
 }
 
+void USAttributeComponent::MulticastRageChanged_Implementation(AActor* InstigatorActor, float NewRage, float Delta)
+{
+	OnRageChanged.Broadcast(InstigatorActor, this, NewRage, Delta);
+}
+
+void USAttributeComponent::MulticastHealthChanged_Implementation(AActor* InstigatorActor, float NewHealth, float Delta)
+{
+	OnHealthChanged.Broadcast(InstigatorActor, this, NewHealth, Delta);
+}
+
+void USAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(USAttributeComponent, Health);
+	DOREPLIFETIME_CONDITION(USAttributeComponent, HealthMax, COND_InitialOnly);
+
+	DOREPLIFETIME_CONDITION(USAttributeComponent, Rage, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(USAttributeComponent, RageMax, COND_InitialOnly);
+}
