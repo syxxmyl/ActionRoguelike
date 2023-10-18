@@ -49,6 +49,9 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	UFUNCTION(Server, Reliable)
+	void ServerStartActionByName(AActor* Instigator, FName ActionName);
+
 protected:
 
 	UPROPERTY(EditAnyWhere, Category = "Actions")

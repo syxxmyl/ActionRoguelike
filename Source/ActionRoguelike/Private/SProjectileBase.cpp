@@ -39,7 +39,7 @@ ASProjectileBase::ASProjectileBase()
 	InnerRadius = 200.0f;
 	OuterRadius = 2000.0f;
 
-	// SetReplicates(true);
+	SetReplicates(true);
 }
 
 // Called when the game starts or when spawned
