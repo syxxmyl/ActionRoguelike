@@ -90,7 +90,7 @@ void ASAICharacter::OnPawnSeen(APawn* Pawn)
 		if (PlayerSpottedWidget)
 		{
 			PlayerSpottedWidget->BindAttachedActor(this);
-			PlayerSpottedWidget->AddToViewport();
+			PlayerSpottedWidget->AddToViewport(10);
 		}
     }
 

@@ -24,5 +24,8 @@ void ASPowerUpActor_ActionActivate::Interact_Implementation(APawn* InstigatorPaw
 		return;
 	}
 
-	ActionComp->AddAction(InstigatorPawn, ActivateActionClass);	
+	if (PowerUp())
+	{
+		ActionComp->AddAction(InstigatorPawn, ActivateActionClass);
+	}
 }
