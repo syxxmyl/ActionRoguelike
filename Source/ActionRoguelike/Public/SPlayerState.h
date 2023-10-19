@@ -6,8 +6,8 @@
 #include "GameFramework/PlayerState.h"
 #include "SPlayerState.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnCreditChanged, ASPlayerState*, OwningPlayerState, float, NewCredit, float, Delta);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnCreditChanged, ASPlayerState*, OwningPlayerState, float, NewCredit, float, Delta);
 
 
 /**
@@ -30,8 +30,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "PlayerState")
 	static ASPlayerState* GetPlayerState(APawn* FromActor);
 
+	UFUNCTION(Server, Reliable)
+	void ServerCreditChanged(float Delta);
+
 protected:
-	UPROPERTY(VisibleAnyWhere, Category = "PlayerState")
+	UFUNCTION()
+	void OnRep_CreditChanged(float OldCredit);
+
+protected:
+	UPROPERTY(VisibleAnyWhere, ReplicatedUsing = "OnRep_CreditChanged", Category = "PlayerState")
 	float Credit;
 
 	UPROPERTY(BlueprintAssignable, Category = "PlayerState")
