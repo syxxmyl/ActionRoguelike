@@ -3,6 +3,7 @@
 
 #include "SPowerUpActor.h"
 #include "Components/SphereComponent.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ASPowerUpActor::ASPowerUpActor()
@@ -14,18 +15,21 @@ ASPowerUpActor::ASPowerUpActor()
 	RootComponent = SphereComp;
 
 	PowerUpCDTime = 10.0f;
-	IsInCD = false;
+	bIsVisible = true;
 
 	SetReplicates(true);
 }
 
 void ASPowerUpActor::ResetCD()
 {
-	GetWorldTimerManager().ClearTimer(TimerHandle_CD);
-	IsInCD = false;
+	bIsVisible = true;
+	OnRep_VisibleChanged();
+}
 
-	SetActorEnableCollision(true);
-	RootComponent->SetVisibility(true, true);
+void ASPowerUpActor::OnRep_VisibleChanged()
+{
+	SetActorEnableCollision(bIsVisible);
+	RootComponent->SetVisibility(bIsVisible, true);	
 }
 
 void ASPowerUpActor::Interact_Implementation(APawn* InstigatorPawn)
@@ -35,15 +39,20 @@ void ASPowerUpActor::Interact_Implementation(APawn* InstigatorPawn)
 
 bool ASPowerUpActor::PowerUp()	
 {
-	if (!IsInCD)
+	if (bIsVisible)
 	{
+		bIsVisible = false;
+		OnRep_VisibleChanged();
 		GetWorldTimerManager().SetTimer(TimerHandle_CD, this, &ASPowerUpActor::ResetCD, PowerUpCDTime);
-		IsInCD = true;
-
-		SetActorEnableCollision(false);
-		RootComponent->SetVisibility(false, true);
 		return true;
 	}
 
 	return false;
+}
+
+void ASPowerUpActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASPowerUpActor, bIsVisible);
 }

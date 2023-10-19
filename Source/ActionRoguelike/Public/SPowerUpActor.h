@@ -19,23 +19,27 @@ public:
 	// Sets default values for this actor's properties
 	ASPowerUpActor();
 
-protected:
+	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 
+	UFUNCTION(BlueprintCallable)
+	bool PowerUp();
+
+protected:
 	void ResetCD();
 
+	UFUNCTION()
+	void OnRep_VisibleChanged();
+
+protected:
 	UPROPERTY(EditAnywhere)
 	USphereComponent* SphereComp;
 
 	UPROPERTY(EditAnywhere, Category = "PowerUp")
 	float PowerUpCDTime;
 
-	bool IsInCD;
+	UPROPERTY(ReplicatedUsing = "OnRep_VisibleChanged", BlueprintReadOnly)
+	bool bIsVisible;
 
 	FTimerHandle TimerHandle_CD;
 
-public:
-	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
-
-	UFUNCTION(BlueprintCallable)
-	bool PowerUp();
 };
