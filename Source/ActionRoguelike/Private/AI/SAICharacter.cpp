@@ -86,12 +86,7 @@ void ASAICharacter::OnPawnSeen(APawn* Pawn)
 {
     if (CurrentTargetActor != Pawn)
     {
-		USWorldUserWidget* PlayerSpottedWidget = CreateWidget<USWorldUserWidget>(GetWorld(), PlayerSpottedWidgetClass);
-		if (PlayerSpottedWidget)
-		{
-			PlayerSpottedWidget->BindAttachedActor(this);
-			PlayerSpottedWidget->AddToViewport(10);
-		}
+        MulticastPlayerSpotted();
     }
 
     SetTargetActor(Pawn);
@@ -107,5 +102,15 @@ void ASAICharacter::SetTargetActor(AActor* TargetActor)
 	}
 
     CurrentTargetActor = TargetActor;
+}
+
+void ASAICharacter::MulticastPlayerSpotted_Implementation()
+{
+	USWorldUserWidget* PlayerSpottedWidget = CreateWidget<USWorldUserWidget>(GetWorld(), PlayerSpottedWidgetClass);
+	if (PlayerSpottedWidget)
+	{
+		PlayerSpottedWidget->BindAttachedActor(this);
+		PlayerSpottedWidget->AddToViewport(10);
+	}
 }
 

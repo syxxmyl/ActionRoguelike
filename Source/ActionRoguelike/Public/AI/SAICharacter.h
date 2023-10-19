@@ -34,6 +34,9 @@ protected:
 
 	void SetTargetActor(AActor* TargetActor);
 
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastPlayerSpotted();
+
 protected:
 
 	UPROPERTY(EditAnyWhere, Category = "Components")
