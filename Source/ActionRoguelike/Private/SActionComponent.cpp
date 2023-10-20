@@ -3,6 +3,7 @@
 
 #include "SActionComponent.h"
 #include "SAction.h"
+#include "../ActionRoguelike.h"
 
 // Sets default values for this component's properties
 USActionComponent::USActionComponent()
@@ -34,8 +35,21 @@ void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 	// ...
 
-	FString DebugStr = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugStr);
+	// FString DebugStr = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
+	// GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugStr);
+
+	for (USAction* Action : Actions)
+	{
+		FColor TextColor = Action->IsRunning() ? FColor::Blue : FColor::White;
+
+		FString ActionMsg = FString::Printf(TEXT("[%s] Action: %s : IsRunning: %s : Outer: %s"),
+			*GetNameSafe(GetOwner()),
+			*Action->ActionName.ToString(),
+			Action->IsRunning() ? TEXT("true") : TEXT("false"),
+			*GetNameSafe(Action->GetOuter()));
+
+		LogOnScreen(this, ActionMsg, TextColor, 0.0f);
+	}
 }
 
 void USActionComponent::AddAction(AActor* Instigator, TSubclassOf<USAction> ActionClass)
