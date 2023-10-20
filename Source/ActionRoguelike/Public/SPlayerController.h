@@ -8,6 +8,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStateChanged, APlayerState*, NewPlayerState);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPawnChanged, APawn*, NewPawn);
 /**
  * 
  */
@@ -19,6 +20,8 @@ class ACTIONROGUELIKE_API ASPlayerController : public APlayerController
 protected:
 	virtual void BeginPlayingState() override;
 
+	virtual void SetPawn(APawn* InPawn) override;
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void BlueprintBeginPlayingState();
 
@@ -27,4 +30,7 @@ protected:
 protected:
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerStateChanged OnPlayerStateReceived;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnPawnChanged OnPawnChanged;
 };
