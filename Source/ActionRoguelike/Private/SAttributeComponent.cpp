@@ -26,29 +26,32 @@ bool USAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delt
 		return false;
 	}
 
-	float OldHealth = Health;
-
 	float AmountMultiplier = 1.0f;
 	if (Delta < 0.0f)
 	{
 		AmountMultiplier = CVarDamageMultiplier.GetValueOnGameThread();
 	}
-
 	Delta = Delta * AmountMultiplier;
-	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
-	float RealDelta = Health - OldHealth;
-	// OnHealthChanged.Broadcast(InstigatorActor, this, Health, RealDelta);
-	if (RealDelta != 0.0f)
-	{
-		MulticastHealthChanged(InstigatorActor, Health, RealDelta);
-	}
 
-	if (RealDelta < 0.0f && Health == 0.0f)
+	float OldHealth = Health;
+	float NewHealth = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
+	float RealDelta = NewHealth - OldHealth;
+
+	if (GetOwner()->HasAuthority())
 	{
-		ASGameModeBase* GM = GetWorld()->GetAuthGameMode<ASGameModeBase>();
-		if (GM)
+		Health = NewHealth;
+		if (RealDelta != 0.0f)
 		{
-			GM->OnActorKilled(GetOwner(), InstigatorActor);
+			MulticastHealthChanged(InstigatorActor, Health, RealDelta);
+		}
+
+		if (RealDelta < 0.0f && Health == 0.0f)
+		{
+			ASGameModeBase* GM = GetWorld()->GetAuthGameMode<ASGameModeBase>();
+			if (GM)
+			{
+				GM->OnActorKilled(GetOwner(), InstigatorActor);
+			}
 		}
 	}
 
@@ -109,13 +112,19 @@ bool USAttributeComponent::ApplyRageChange(AActor* InstigatorActor, float Delta)
 	}
 
 	float OldRage = Rage;
-	Rage = FMath::Clamp(Rage + Delta, 0.0f, RageMax);
-	float RealDelta = Rage - OldRage;
-	// OnRageChanged.Broadcast(InstigatorActor, this, Rage, RealDelta);
-	if (RealDelta != 0.0f)
+	float NewRage = FMath::Clamp(Rage + Delta, 0.0f, RageMax);
+	float RealDelta = NewRage - OldRage;
+
+	if (GetOwner()->HasAuthority())
 	{
-		MulticastRageChanged_Implementation(InstigatorActor, Rage, RealDelta);
+		Rage = NewRage;
+
+		if (RealDelta != 0.0f)
+		{
+			MulticastRageChanged_Implementation(InstigatorActor, Rage, RealDelta);
+		}
 	}
+	
 	return RealDelta != 0;
 }
 

@@ -11,6 +11,20 @@
 class UWorld;
 class USActionComponent;
 
+
+USTRUCT()
+struct FActionRepData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+	AActor* InstigatorActor;
+
+	UPROPERTY()
+	bool bIsRunning;
+};
+
 /**
  * 
  */
@@ -53,7 +67,7 @@ protected:
 	USActionComponent* GetOwningComponent() const;
 
 	UFUNCTION()
-	void OnRep_IsRunning();
+	void OnRep_ActionRepDataChanged();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Tags")
@@ -62,8 +76,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Tags")
 	FGameplayTagContainer BlockedTags;
 
-	UPROPERTY(ReplicatedUsing = "OnRep_IsRunning")
-	bool bIsRunning;
+	UPROPERTY(ReplicatedUsing = "OnRep_ActionRepDataChanged")
+	FActionRepData ActionRepData;
 
 	UPROPERTY(Replicated)
 	USActionComponent* ActionComp;
