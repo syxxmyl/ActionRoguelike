@@ -40,8 +40,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Actions")
 	static USActionComponent* GetActions(AActor* FromActor);	
 
-public:
+	virtual bool ReplicateSubobjects(class UActorChannel* Channel, class FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
 	FGameplayTagContainer ActiveGameplayTags;
 
@@ -53,13 +54,10 @@ protected:
 	void ServerStartActionByName(AActor* Instigator, FName ActionName);
 
 protected:
-
 	UPROPERTY(EditAnyWhere, Category = "Actions")
 	TArray<TSubclassOf<USAction>> DefaultActions;
 
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	TArray<USAction*> Actions;
-	
-
 		
 };

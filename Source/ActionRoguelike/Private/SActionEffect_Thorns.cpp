@@ -14,7 +14,6 @@ USActionEffect_Thorns::USActionEffect_Thorns()
 
 void USActionEffect_Thorns::StartAction_Implementation(AActor* Instigator)
 {
-	USActionComponent* ActionComp = GetOwningComponent();
 	if (ActionComp)
 	{
 		USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(ActionComp->GetOwner());
@@ -27,7 +26,6 @@ void USActionEffect_Thorns::StartAction_Implementation(AActor* Instigator)
 
 void USActionEffect_Thorns::StopAction_Implementation(AActor* Instigator)
 {
-	USActionComponent* ActionComp = GetOwningComponent();
 	if (ActionComp)
 	{
 		USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(ActionComp->GetOwner());
@@ -45,7 +43,6 @@ void USActionEffect_Thorns::OnHealthChanged(AActor* InstigatorActor, USAttribute
 		return;
 	}
 
-	USActionComponent* ActionComp = GetOwningComponent();
 	if (!ActionComp)
 	{
 		return;

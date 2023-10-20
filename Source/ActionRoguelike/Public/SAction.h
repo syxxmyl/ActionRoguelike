@@ -20,7 +20,6 @@ class ACTIONROGUELIKE_API USAction : public UObject
 	GENERATED_BODY()
 	
 public:
-
 	UFUNCTION(BlueprintNativeEvent, Category = "Action")
 	void StartAction(AActor* Instigator);
 
@@ -38,8 +37,11 @@ public:
 
 	UWorld* GetWorld() const override;	
 
-public:
+	bool IsSupportedForNetworking() const override;
 
+	void Initialize(USActionComponent* NewActionComp);
+
+public:
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	FName ActionName;
 
@@ -47,17 +49,22 @@ public:
 	bool bAutoStart;
 
 protected:
-
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	USActionComponent* GetOwningComponent() const;
 
-protected:
+	UFUNCTION()
+	void OnRep_IsRunning();
 
+protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Tags")
 	FGameplayTagContainer GrantsTags;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Tags")
 	FGameplayTagContainer BlockedTags;
 
+	UPROPERTY(ReplicatedUsing = "OnRep_IsRunning")
 	bool bIsRunning;
+
+	UPROPERTY(Replicated)
+	USActionComponent* ActionComp;
 };
