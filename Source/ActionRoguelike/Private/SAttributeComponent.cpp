@@ -121,7 +121,7 @@ bool USAttributeComponent::ApplyRageChange(AActor* InstigatorActor, float Delta)
 
 		if (RealDelta != 0.0f)
 		{
-			MulticastRageChanged_Implementation(InstigatorActor, Rage, RealDelta);
+			MulticastRageChanged(InstigatorActor, Rage, RealDelta);
 		}
 	}
 	
