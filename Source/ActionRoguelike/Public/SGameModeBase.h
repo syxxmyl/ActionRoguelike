@@ -13,6 +13,7 @@ class UEnvQueryInstanceBlueprintWrapper;
 class ASAICharacter;
 class UCurveFloat;
 class ASPowerUpActor;
+class USSaveGame;
 
 /**
  * 
@@ -32,6 +33,13 @@ public:
 	void KillAll();
 
 	virtual void OnActorKilled(AActor* VictimActor, AActor* Killer);
+
+	UFUNCTION(BlueprintCallable, Category = "SaveGame")
+	void WriteSaveGame();
+
+	void LoadSaveGame();
+
+	void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 
 protected:
 
@@ -89,4 +97,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "PowerUpActor")
 	float SpawnPowerUpActorTimerInterval;
+
+	UPROPERTY()
+	USSaveGame* CurrentSaveGame;
+
+	FString SlotName;
 };
