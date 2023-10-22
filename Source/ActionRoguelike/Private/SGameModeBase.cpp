@@ -14,6 +14,8 @@
 #include "SPowerUpActor.h"
 #include "SSaveGame.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/GameModeBase.h"
+#include "GameFramework/GameStateBase.h"
 
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT("Enable Spawning of Bots via Timer"), ECVF_Cheat);
@@ -38,6 +40,18 @@ void ASGameModeBase::InitGame(const FString& MapName, const FString& Options, FS
 	LoadSaveGame();
 }
 
+
+void ASGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
+{
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
+
+	ASPlayerState* PlayerState = NewPlayer->GetPlayerState<ASPlayerState>();
+	if (PlayerState)
+	{
+		PlayerState->LoadPlayerState(CurrentSaveGame);
+	}
+
+}
 
 void ASGameModeBase::StartPlay()
 {
@@ -218,6 +232,16 @@ void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 
 void ASGameModeBase::WriteSaveGame()
 {
+	for (int32 i = 0; i != GameState->PlayerArray.Num(); ++i)
+	{
+		ASPlayerState* PlayerState = Cast<ASPlayerState>(GameState->PlayerArray[i]);
+		if (PlayerState)
+		{
+			PlayerState->SavePlayerState(CurrentSaveGame);
+			break;
+		}
+	}
+
 	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SlotName, 0);
 }
 

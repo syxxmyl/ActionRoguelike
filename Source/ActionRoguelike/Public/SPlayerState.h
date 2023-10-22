@@ -10,6 +10,8 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnCreditChanged, ASPlayerState*, OwningPlayerState, float, NewCredit, float, Delta);
 
 
+class USSaveGame;
+
 /**
  * 
  */
@@ -32,6 +34,15 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerCreditChanged(float Delta);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void SavePlayerState(USSaveGame* SaveObject);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void LoadPlayerState(USSaveGame* SaveObject);
+
+	UFUNCTION(BlueprintCallable, Category = "PlayerState")
+	float GetCredit();
 
 protected:
 	UFUNCTION()
