@@ -66,6 +66,8 @@ protected:
 
 	void LoadSaveActorData();
 
+	void WriteSaveActorData();
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	UEnvQuery* SpawnBotQuery;

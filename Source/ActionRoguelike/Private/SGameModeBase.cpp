@@ -17,6 +17,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/GameStateBase.h"
 #include "SGameplayInterface.h"
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT("Enable Spawning of Bots via Timer"), ECVF_Cheat);
@@ -222,6 +223,36 @@ void ASGameModeBase::TryToAddCredits(AActor* VictimActor, AActor* Killer)
 	PlayerState->ApplyCreditChange(KillMinionObtainCreditAmount);
 }
 
+void ASGameModeBase::WriteSaveActorData()
+{
+	if (!CurrentSaveGame)
+	{
+		return;
+	}
+
+	CurrentSaveGame->SaveActors.Empty();
+	for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (!Actor->Implements<USGameplayInterface>())
+		{
+			continue;
+		}
+
+		FActorSaveData ActorSaveData;
+		ActorSaveData.ActorName = Actor->GetName();
+		ActorSaveData.Transform = Actor->GetTransform();
+
+		FMemoryWriter MemWriter(ActorSaveData.ByteData);
+		FObjectAndNameAsStringProxyArchive ArchiveData(MemWriter, true);
+		ArchiveData.ArIsSaveGame = true;
+
+		Actor->Serialize(ArchiveData);
+
+		CurrentSaveGame->SaveActors.Add(ActorSaveData);
+	}
+}
+
 void ASGameModeBase::LoadSaveActorData()
 {
 	if (!CurrentSaveGame || CurrentSaveGame->SaveActors.Num() == 0)
@@ -242,6 +273,15 @@ void ASGameModeBase::LoadSaveActorData()
 			if (ActorSaveData.ActorName == Actor->GetName())
 			{
 				Actor->SetActorTransform(ActorSaveData.Transform);
+
+				FMemoryReader MemReader(ActorSaveData.ByteData);
+				FObjectAndNameAsStringProxyArchive ArchiveData(MemReader, true);
+				ArchiveData.ArIsSaveGame = true;
+
+				Actor->Serialize(ArchiveData);
+
+				ISGameplayInterface::Execute_OnActorLoaded(Actor);
+
 				break;
 			}
 		}
@@ -271,21 +311,7 @@ void ASGameModeBase::WriteSaveGame()
 		}
 	}
 
-	CurrentSaveGame->SaveActors.Empty();
-	for (TActorIterator<AActor> It(GetWorld()); It; ++It)
-	{
-		AActor* Actor = *It;
-		if (!Actor->Implements<USGameplayInterface>())
-		{
-			continue;
-		}
-
-		FActorSaveData ActorSaveData;
-		ActorSaveData.ActorName = Actor->GetName();
-		ActorSaveData.Transform = Actor->GetTransform();
-
-		CurrentSaveGame->SaveActors.Add(ActorSaveData);
-	}
+	WriteSaveActorData();
 
 	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SlotName, 0);
 }
