@@ -64,6 +64,7 @@ protected:
 
 	void TryToAddCredits(AActor* VictimActor, AActor* Killer);
 
+	void LoadSaveActorData();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AI")

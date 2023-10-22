@@ -16,6 +16,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/GameStateBase.h"
+#include "SGameplayInterface.h"
 
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT("Enable Spawning of Bots via Timer"), ECVF_Cheat);
@@ -60,6 +61,8 @@ void ASGameModeBase::StartPlay()
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBot, this, &ASGameModeBase::SpawnBotTimerElapsed, SpawnBotTimerInterval, true);
 
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnPowerUpActor, this, &ASGameModeBase::SpawnPowerUpActorTimerElapsed, SpawnPowerUpActorTimerInterval, false);
+
+	LoadSaveActorData();
 }
 
 void ASGameModeBase::KillAll()
@@ -219,6 +222,32 @@ void ASGameModeBase::TryToAddCredits(AActor* VictimActor, AActor* Killer)
 	PlayerState->ApplyCreditChange(KillMinionObtainCreditAmount);
 }
 
+void ASGameModeBase::LoadSaveActorData()
+{
+	if (!CurrentSaveGame || CurrentSaveGame->SaveActors.Num() == 0)
+	{
+		return;
+	}
+
+	for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (!Actor->Implements<USGameplayInterface>())
+		{
+			continue;
+		}
+
+		for (FActorSaveData& ActorSaveData : CurrentSaveGame->SaveActors)
+		{
+			if (ActorSaveData.ActorName == Actor->GetName())
+			{
+				Actor->SetActorTransform(ActorSaveData.Transform);
+				break;
+			}
+		}
+	}
+}
+
 void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 {
 	TryToRespawnPlayer(VictimActor);
@@ -240,6 +269,22 @@ void ASGameModeBase::WriteSaveGame()
 			PlayerState->SavePlayerState(CurrentSaveGame);
 			break;
 		}
+	}
+
+	CurrentSaveGame->SaveActors.Empty();
+	for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (!Actor->Implements<USGameplayInterface>())
+		{
+			continue;
+		}
+
+		FActorSaveData ActorSaveData;
+		ActorSaveData.ActorName = Actor->GetName();
+		ActorSaveData.Transform = Actor->GetTransform();
+
+		CurrentSaveGame->SaveActors.Add(ActorSaveData);
 	}
 
 	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SlotName, 0);
