@@ -10,6 +10,7 @@
 
 class UWorld;
 class USActionComponent;
+class UTexture2D;
 
 
 USTRUCT()
@@ -81,4 +82,7 @@ protected:
 
 	UPROPERTY(Replicated)
 	USActionComponent* ActionComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	UTexture2D* Icon;
 };
