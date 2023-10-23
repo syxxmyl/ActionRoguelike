@@ -4,6 +4,12 @@
 #include "SActionEffect.h"
 #include "SActionComponent.h"
 
+float USActionEffect::GetTimeRemaining() const
+{
+	float EndTime = Duration + TimeStarted;
+	return EndTime - GetWorld()->TimeSeconds;
+}
+
 USActionEffect::USActionEffect()
 {
 	bAutoStart = true;
