@@ -45,14 +45,13 @@ void ASGameModeBase::InitGame(const FString& MapName, const FString& Options, FS
 
 void ASGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
-	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
-
 	ASPlayerState* PlayerState = NewPlayer->GetPlayerState<ASPlayerState>();
 	if (PlayerState)
 	{
 		PlayerState->LoadPlayerState(CurrentSaveGame);
 	}
 
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 }
 
 void ASGameModeBase::StartPlay()
