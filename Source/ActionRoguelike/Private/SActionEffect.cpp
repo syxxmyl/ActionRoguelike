@@ -3,11 +3,22 @@
 
 #include "SActionEffect.h"
 #include "SActionComponent.h"
+#include "GameFramework/GameStateBase.h"
 
 float USActionEffect::GetTimeRemaining() const
 {
-	float EndTime = Duration + TimeStarted;
-	return EndTime - GetWorld()->TimeSeconds;
+	float RemainingSecond = Duration;
+	AGameStateBase* GameState = GetWorld()->GetGameState<AGameStateBase>();
+	if (GameState)
+	{
+		float EndTime = Duration + TimeStarted;
+		if (EndTime - GameState->GetServerWorldTimeSeconds() > 0.0f)
+		{
+			RemainingSecond = EndTime - GameState->GetServerWorldTimeSeconds();
+		}
+	}
+
+	return RemainingSecond;
 }
 
 USActionEffect::USActionEffect()

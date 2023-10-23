@@ -86,5 +86,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	UTexture2D* Icon;
 
+	UPROPERTY(Replicated)
 	float TimeStarted;
 };
