@@ -21,6 +21,7 @@
 #include "SMonsterData.h"
 #include "../ActionRoguelike.h"
 #include "SActionComponent.h"
+#include "Engine/AssetManager.h"
 
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT("Enable Spawning of Bots via Timer"), ECVF_Cheat);
@@ -142,27 +143,53 @@ void ASGameModeBase::OnSpawnBotQueryCompleted(UEnvQueryInstanceBlueprintWrapper*
 			int32 randomIdx = FMath::RandRange(0, Rows.Num() - 1);
 			FMonsterInfoRow* SelectedRow = Rows[randomIdx];
 
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-			AActor* NewBot = GetWorld()->SpawnActor<ASAICharacter>(SelectedRow->MonsterData->MonsterClass, Locations[0], FRotator::ZeroRotator, SpawnParams);
-			if (NewBot)
+			UAssetManager* Manager = UAssetManager::GetIfValid();
+			if (Manager)
 			{
-				LogOnScreen(this, FString::Printf(TEXT("Spawned enemy: %s (%s)"), *GetNameSafe(NewBot), *GetNameSafe(SelectedRow->MonsterData)));
-				USActionComponent* ActionComp = USActionComponent::GetActions(NewBot);
-				if (ActionComp)
-				{
-					for (TSubclassOf<USAction> ActionClass : SelectedRow->MonsterData->Actions)
-					{
-						ActionComp->AddAction(NewBot, ActionClass);
-					}
-				}
+				LogOnScreen(this, "Loading monster...", FColor::Green);
 
+				TArray<FName> Bundles;
+				FStreamableDelegate Delegate = FStreamableDelegate::CreateUObject(this, &ASGameModeBase::OnMonsterLoaded, SelectedRow->MonsterId, Locations[0]);
+				Manager->LoadPrimaryAsset(SelectedRow->MonsterId, Bundles, Delegate);
+			}			
+		}
+	}
+}
+
+void ASGameModeBase::OnMonsterLoaded(FPrimaryAssetId LoadedId, FVector SpawnLocation)
+{
+	UAssetManager* Manager = UAssetManager::GetIfValid();
+	if (!Manager)
+	{
+		return;
+	}
+
+	USMonsterData* MonsterData = Cast<USMonsterData>(Manager->GetPrimaryAssetObject(LoadedId));
+	if (!MonsterData)
+	{
+		return;
+	}
+	
+	LogOnScreen(this, "Finished loading.", FColor::Green);
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	AActor* NewBot = GetWorld()->SpawnActor<ASAICharacter>(MonsterData->MonsterClass, SpawnLocation, FRotator::ZeroRotator, SpawnParams);
+	if (NewBot)
+	{
+		LogOnScreen(this, FString::Printf(TEXT("Spawned enemy: %s (%s)"), *GetNameSafe(NewBot), *GetNameSafe(MonsterData)));
+		USActionComponent* ActionComp = USActionComponent::GetActions(NewBot);
+		if (ActionComp)
+		{
+			for (TSubclassOf<USAction> ActionClass : MonsterData->Actions)
+			{
+				ActionComp->AddAction(NewBot, ActionClass);
 			}
 		}
-
-		DrawDebugSphere(GetWorld(), Locations[0], 50.0f, 20, FColor::Blue, false, 60.0f);
 	}
+
+	DrawDebugSphere(GetWorld(), SpawnLocation, 50.0f, 20, FColor::Blue, false, 60.0f);
 }
 
 void ASGameModeBase::RespawnPlayerElapsed(AController* Controller)

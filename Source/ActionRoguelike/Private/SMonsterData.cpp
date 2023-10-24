@@ -3,3 +3,7 @@
 
 #include "SMonsterData.h"
 
+FPrimaryAssetId USMonsterData::GetPrimaryAssetId() const
+{
+	return FPrimaryAssetId("Monsters", GetFName());
+}

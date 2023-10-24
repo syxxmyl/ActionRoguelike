@@ -17,6 +17,8 @@ class ACTIONROGUELIKE_API USMonsterData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 	
+public:
+	FPrimaryAssetId GetPrimaryAssetId() const override;
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Spawn Info")

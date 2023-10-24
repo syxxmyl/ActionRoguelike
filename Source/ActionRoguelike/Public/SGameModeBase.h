@@ -34,7 +34,7 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	USMonsterData* MonsterData;
+	FPrimaryAssetId MonsterId;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Weight;
@@ -98,6 +98,9 @@ protected:
 	void LoadSaveActorData();
 
 	void WriteSaveActorData();
+
+	void OnMonsterLoaded(FPrimaryAssetId LoadedId, FVector SpawnLocation);
+
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
