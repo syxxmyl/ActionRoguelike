@@ -19,6 +19,8 @@
 #include "SGameplayInterface.h"
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 #include "SMonsterData.h"
+#include "../ActionRoguelike.h"
+#include "SActionComponent.h"
 
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT("Enable Spawning of Bots via Timer"), ECVF_Cheat);
@@ -143,7 +145,20 @@ void ASGameModeBase::OnSpawnBotQueryCompleted(UEnvQueryInstanceBlueprintWrapper*
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-			GetWorld()->SpawnActor<ASAICharacter>(SelectedRow->MonsterData->MonsterClass, Locations[0], FRotator::ZeroRotator, SpawnParams);
+			AActor* NewBot = GetWorld()->SpawnActor<ASAICharacter>(SelectedRow->MonsterData->MonsterClass, Locations[0], FRotator::ZeroRotator, SpawnParams);
+			if (NewBot)
+			{
+				LogOnScreen(this, FString::Printf(TEXT("Spawned enemy: %s (%s)"), *GetNameSafe(NewBot), *GetNameSafe(SelectedRow->MonsterData)));
+				USActionComponent* ActionComp = USActionComponent::GetActions(NewBot);
+				if (ActionComp)
+				{
+					for (TSubclassOf<USAction> ActionClass : SelectedRow->MonsterData->Actions)
+					{
+						ActionComp->AddAction(NewBot, ActionClass);
+					}
+				}
+
+			}
 		}
 
 		DrawDebugSphere(GetWorld(), Locations[0], 50.0f, 20, FColor::Blue, false, 60.0f);
