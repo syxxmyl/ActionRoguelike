@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "EnvironmentQuery/EnvQueryTypes.h"
+#include "Engine/DataTable.h"
 #include "SGameModeBase.generated.h"
 
 
@@ -14,6 +15,36 @@ class ASAICharacter;
 class UCurveFloat;
 class ASPowerUpActor;
 class USSaveGame;
+class UDataTable;
+class USMonsterData;
+
+/* DataTable Row for spawning monsters in game mode  */
+USTRUCT(BlueprintType)
+struct FMonsterInfoRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+public:
+	FMonsterInfoRow()
+	{
+		Weight = 1.0f;
+		SpawnCost = 5.0f;
+		KillReward = 20.0f;
+	}
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	USMonsterData* MonsterData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Weight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float SpawnCost;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float KillReward;
+};
 
 /**
  * 
@@ -78,7 +109,10 @@ protected:
 	float SpawnBotTimerInterval;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
-	TSubclassOf<ASAICharacter> MinionClass;
+	UDataTable* MonsterTable;
+
+	/*UPROPERTY(EditDefaultsOnly, Category = "AI")
+	TSubclassOf<ASAICharacter> MinionClass;*/
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	UCurveFloat* DifficultyCurve;
