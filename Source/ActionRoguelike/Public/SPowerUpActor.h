@@ -16,13 +16,15 @@ class ACTIONROGUELIKE_API ASPowerUpActor : public AActor, public ISGameplayInter
 	GENERATED_BODY()
 	
 public:	
+	UFUNCTION(BlueprintCallable)
+	bool PowerUp();
+
 	// Sets default values for this actor's properties
 	ASPowerUpActor();
 
-	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
+	void Interact_Implementation(APawn* InstigatorPawn) override;
 
-	UFUNCTION(BlueprintCallable)
-	bool PowerUp();
+	FText GetInteractText_Implementation(APawn* InstigatorPawn);
 
 protected:
 	void ResetCD();
