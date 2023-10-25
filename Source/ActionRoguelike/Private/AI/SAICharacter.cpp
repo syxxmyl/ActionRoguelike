@@ -27,7 +27,7 @@ ASAICharacter::ASAICharacter()
 
     HitFlashParamName = "LastHitTime";
 
-    GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
+    // GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
     GetMesh()->SetGenerateOverlapEvents(true);
 }
 
