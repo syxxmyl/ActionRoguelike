@@ -35,6 +35,8 @@ ASCharacter::ASCharacter()
 	bUseControllerRotationYaw = false;
 
 	PrimaryAttackClassName = "MagicProjectile";
+
+	GetMesh()->SetGenerateOverlapEvents(true);
 }
 
 void ASCharacter::PostInitializeComponents()
